@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동물 초성 퀴즈</title>
+    <style>
+        /* Noto Sans KR 글꼴 가져오기 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f8ff; /* 연한 하늘색 배경 */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* 스크롤 방지 */
+        }
+
+        #game-container {
+            width: 90%;
+            max-width: 500px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px 30px;
+            text-align: center;
+            border: 2px solid #b0e0e6; /* 연한 테두리 */
+        }
+
+        /* --- 상태 표시줄 (문제 번호, 점수) --- */
+        #status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0056b3; /* 진한 파란색 */
+            margin-bottom: 20px;
+        }
+
+        #question-area {
+            margin-bottom: 20px;
+        }
+
+        /* --- 초성 --- */
+        #choseong-display {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #007bff; /* 파란색 */
+            letter-spacing: 10px;
+            margin-bottom: 15px;
+            padding: 20px 0;
+            background-color: #f8f9fa; /* 연한 회색 배경 */
+            border-radius: 10px;
+        }
+
+        /* --- 타이머 --- */
+        #timer-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #timer-bar {
+            width: 100%;
+            height: 100%;
+            background-color: #28a745; /* 초록색 (3점) */
+            transition: width 1s linear; /* 타이머가 부드럽게 줄어듦 */
+        }
+
+        /* --- 힌트 영역 --- */
+        #hint-area {
+            min-height: 150px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed #b0e0e6;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .hint-box {
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        /* 이미지 힌트 (이모지) */
+        #image-hint {
+            font-size: 5rem;
+        }
+        
+        /* 힌트 초기 상태 (숨김) */
+        #image-hint.hidden {
+            display: none;
+        }
+
+        /* --- 입력 영역 --- */
+        #input-area {
+            margin-top: 25px;
+            display: flex;
+            gap: 10px;
+        }
+
+        #answer-input {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #ced4da;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+
+        #answer-input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        #submit-btn {
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* --- 피드백 메시지 (정답/오답/시간초과) --- */
+        .feedback {
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 20px;
+            display: none; /* 초기 숨김 */
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .feedback.correct {
+            color: #28a745;
+            background-color: #e6f7ec;
+        }
+
+        .feedback.wrong {
+            color: #dc3545;
+            background-color: #fdeeee;
+        }
+        
+        .feedback.info {
+            color: #0056b3; /* 진한 파란색 */
+            background-color: #e6f0ff; /* 연한 파란색 배경 */
+        }
+        
+        /* --- 게임 종료 오버레이 --- */
+        #game-over-overlay {
+            display: none; /* 초기 숨김 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        #game-over-box {
+            background-color: white;
+            padding: 40px 50px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: zoomIn 0.5s ease; /* 나타날 때 줌인 효과 */
+        }
+
+        #game-over-box h2 {
+            font-size: 2.5rem;
+            color: #007bff;
+            margin-top: 0;
+        }
+        
+        #game-over-box p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        #restart-btn {
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        #restart-btn:hover {
+            background-color: #218838;
+        }
+        
+        @keyframes zoomIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- 게임 상태 표시줄 -->
+        <div id="status-bar">
+            <span id="question-counter">문제 1 / 10</span>
+            <span id="total-score">총 점수: 0 점</span>
+        </div>
+
+        <!-- 퀴즈 영역 -->
+        <div id="question-area">
+            <div id="choseong-display">ㄱㅇㅇ</div>
+            <div id="timer-bar-container">
+                <div id="timer-bar"></div>
+            </div>
+        </div>
+
+        <!-- 힌트 영역 -->
+        <div id="hint-area">
+            <div id="image-hint" class="hint-box hidden"></div>
+            <div id="initial-hint-text" class="hint-box">10초 후에 이미지 힌트가 나옵니다. (총 20초)</div>
+        </div>
+        
+        <!-- 정답/오답/시간초과 피드백 -->
+        <div id="feedback-correct" class="feedback correct">정답입니다! (+0점)</div>
+        <div id="feedback-wrong" class="feedback wrong">틀렸습니다. 다시 시도하세요.</div>
+        <div id="feedback-timeout" class="feedback info">시간 초과! 정답: </div>
+
+        <!-- 정답 입력 영역 -->
+        <div id="input-area">
+            <input type="text" id="answer-input" placeholder="정답을 입력하세요...">
+            <button id="submit-btn">확인</button>
+        </div>
+    </div>
+    
+    <!-- 게임 종료 화면 -->
+    <div id="game-over-overlay">
+        <div id="game-over-box">
+            <h2>게임 종료!</h2>
+            <p id="final-score">최종 점수: 0 점</p>
+            <button id="restart-btn">다시 시작하기</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 데이터 ---
+        // 기초 학습자에게 쉬운 10개의 동물 문제
+        const questionBank = [
+            { choseong: 'ㄱ', answer: '개', imageHint: '🐶', audioHint: '멍멍' },
+            { choseong: 'ㄱㅇㅇ', answer: '고양이', imageHint: '🐱', audioHint: '야옹' },
+            { choseong: 'ㅅㅈ', answer: '사자', imageHint: '🦁', audioHint: '어흥' },
+            { choseong: 'ㅌㄲ', answer: '토끼', imageHint: '🐰', audioHint: '깡총' },
+            { choseong: 'ㅎㄹㅇ', answer: '호랑이', imageHint: '🐯', audioHint: '어흥' },
+            { choseong: 'ㄷㅈ', answer: '돼지', imageHint: '🐷', audioHint: '꿀꿀' },
+            { choseong: 'ㅇㄹ', answer: '오리', imageHint: '🦆', audioHint: '꽥꽥' },
+            { choseong: 'ㅇ', answer: '양', imageHint: '🐑', audioHint: '매-' },
+            { choseong: 'ㅅ', answer: '소', imageHint: '🐮', audioHint: '음메' },
+            { choseong: 'ㅁ', answer: '말', imageHint: '🐴', audioHint: '히힝' }
+            // audioHint는 제거했지만, 데이터 구조는 편의상 유지
+        ];
+
+        let shuffledQuestions = []; // 랜덤으로 섞인 문제들
+        let currentQuestionIndex = 0; // 현재 문제 번호
+        let totalScore = 0; // 총 점수
+        let currentPoints = 2; // *** 변경: 현재 문제의 획득 가능 점수 (기본 2점)
+        let questionTimer; // 타이머 (setInterval)
+        let secondsElapsed; // 현재 문제 경과 시간
+
+        // --- 2. HTML 요소 가져오기 ---
+        const questionCounterEl = document.getElementById('question-counter');
+        const totalScoreEl = document.getElementById('total-score');
+        const choseongDisplayEl = document.getElementById('choseong-display');
+        const timerBarEl = document.getElementById('timer-bar');
+        
+        const hintAreaEl = document.getElementById('hint-area');
+        const initialHintTextEl = document.getElementById('initial-hint-text');
+        const imageHintEl = document.getElementById('image-hint');
+        // audioHintEl 제거
+
+        const answerInputEl = document.getElementById('answer-input');
+        const submitBtnEl = document.getElementById('submit-btn');
+        
+        const feedbackCorrectEl = document.getElementById('feedback-correct');
+        const feedbackWrongEl = document.getElementById('feedback-wrong');
+        const feedbackTimeoutEl = document.getElementById('feedback-timeout'); // 시간 초과 피드백
+        
+        const gameOverOverlayEl = document.getElementById('game-over-overlay');
+        const finalScoreEl = document.getElementById('final-score');
+        const restartBtnEl = document.getElementById('restart-btn');
+
+        // --- 3. 핵심 기능 함수 ---
+
+        /**
+         * 배열을 랜덤으로 섞는 함수 (Fisher-Yates Shuffle)
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        /**
+         * 게임 시작 (또는 재시작) 함수
+         */
+        function startGame() {
+            totalScore = 0;
+            currentQuestionIndex = 0;
+            shuffledQuestions = shuffleArray([...questionBank]); 
+            
+            totalScoreEl.textContent = `총 점수: 0 점`;
+            gameOverOverlayEl.style.display = 'none';
+            
+            // 모든 피드백 숨기기
+            feedbackWrongEl.style.display = 'none';
+            feedbackCorrectEl.style.display = 'none';
+            feedbackTimeoutEl.style.display = 'none';
+            
+            displayQuestion();
+        }
+
+        /**
+         * 현재 문제 인덱스에 맞는 문제를 화면에 표시
+         */
+        function displayQuestion() {
+            // 힌트 및 피드백 숨기기
+            resetHints();
+            feedbackCorrectEl.style.display = 'none';
+            feedbackWrongEl.style.display = 'none';
+            feedbackTimeoutEl.style.display = 'none';
+            
+            // 입력창/버튼 활성화
+            answerInputEl.value = '';
+            answerInputEl.disabled = false;
+            submitBtnEl.disabled = false;
+
+            // 게임 종료 조건: 10문제를 모두 맞혔을 때
+            if (currentQuestionIndex >= 10) {
+                showGameResult();
+                return;
+            }
+
+            // 점수 및 시간 초기화
+            currentPoints = 2; // *** 변경: 기본 점수를 2점으로 설정
+            secondsElapsed = 0;
+            
+            // 타이머 바 초기화
+            timerBarEl.style.transition = 'none'; 
+            timerBarEl.style.width = '100%';
+            timerBarEl.style.backgroundColor = '#28a745'; // 3점 (초록)
+            
+            // 문제 정보 표시
+            const question = shuffledQuestions[currentQuestionIndex];
+            choseongDisplayEl.textContent = question.choseong;
+            questionCounterEl.textContent = `문제 ${currentQuestionIndex + 1} / 10`;
+
+            // 타이머 시작
+            clearInterval(questionTimer); 
+            questionTimer = setInterval(updateTimer, 1000);
+            
+            setTimeout(() => {
+                timerBarEl.style.transition = 'width 1s linear';
+            }, 100);
+        }
+        
+        /**
+         * 힌트 영역을 초기 상태로 되돌림
+         */
+        function resetHints() {
+            imageHintEl.classList.add('hidden');
+            initialHintTextEl.style.display = 'block';
+        }
+
+        /**
+         * 1초마다 호출되는 타이머 함수
+         */
+        function updateTimer() {
+            secondsElapsed++;
+            
+            const totalTime = 20; // 총 시간 20초로 변경
+            
+            let timeRemainingPercent = 100 - (secondsElapsed / totalTime) * 100;
+            timerBarEl.style.width = `${timeRemainingPercent}%`;
+
+            // 1) 10초 경과: 2점 -> 1점, 이미지 힌트
+            if (secondsElapsed === 10) {
+                currentPoints = 1; // *** 변경: 점수를 1점으로 감점
+                showImageHint();
+                timerBarEl.style.backgroundColor = '#ffc107'; // 1점 (주황)
+            }
+            // 2) 20초 경과: 시간 초과 (오디오 힌트 제거)
+            else if (secondsElapsed === 20) {
+                currentPoints = 0;
+                clearInterval(questionTimer); // 타이머 중지
+                handleTimeout(); // 시간 초과 처리 함수 호출
+            }
+        }
+
+        /**
+         * 이미지 힌트 표시
+         */
+        function showImageHint() {
+            const question = shuffledQuestions[currentQuestionIndex];
+            imageHintEl.textContent = question.imageHint;
+            imageHintEl.classList.remove('hidden');
+            initialHintTextEl.style.display = 'none'; // 초기 텍스트 숨기기
+        }
+
+        /**
+         * 시간 초과 처리 함수 (규칙 3)
+         */
+        function handleTimeout() {
+            // 입력창/버튼 비활성화
+            answerInputEl.disabled = true;
+            submitBtnEl.disabled = true;
+            
+            // 힌트 숨기기
+            resetHints();
+            initialHintTextEl.style.display = 'none';
+
+            // 정답 보여주기 (규칙 3)
+            const correctAnswer = shuffledQuestions[currentQuestionIndex].answer;
+            feedbackTimeoutEl.textContent = `시간 초과! 정답은 "${correctAnswer}" 입니다.`;
+            feedbackTimeoutEl.style.display = 'block';
+
+            // 2초 후 게임 재시작 (규칙 3)
+            setTimeout(() => {
+                startGame();
+            }, 2000);
+        }
+
+        /**
+         * "확인" 버튼 클릭 또는 엔터 시 정답 확인
+         */
+        function checkAnswer() {
+            const userInput = answerInputEl.value.trim();
+            const correctAnswer = shuffledQuestions[currentQuestionIndex].answer;
+
+            if (!userInput) return; // 입력값이 없으면 무시
+
+            // 1. 정답인 경우
+            if (userInput === correctAnswer) {
+                // 정답! 타이머 중지.
+                clearInterval(questionTimer);
+                
+                answerInputEl.disabled = true;
+                submitBtnEl.disabled = true;
+
+                totalScore += currentPoints; // 점수 추가
+                totalScoreEl.textContent = `총 점수: ${totalScore} 점`;
+                
+                // 정답 피드백
+                feedbackCorrectEl.textContent = `정답! +${currentPoints}점`;
+                feedbackCorrectEl.style.display = 'block';
+                feedbackWrongEl.style.display = 'none'; // 오답 피드백 숨기기
+
+                currentQuestionIndex++; // 다음 문제로
+                
+                // 1.5초 후 다음 문제
+                setTimeout(displayQuestion, 1500);
+            }
+            // 2. 오답인 경우 (규칙 2)
+            else {
+                // 오답! 타이머는 계속.
+                feedbackWrongEl.textContent = '틀렸습니다. 다시 시도하세요.';
+                feedbackWrongEl.style.display = 'block';
+                answerInputEl.value = ''; // 입력창만 비우기
+
+                // 1초 후 오답 메시지 숨기기
+                setTimeout(() => {
+                    feedbackWrongEl.style.display = 'none';
+                }, 1000);
+            }
+        }
+
+        /**
+         * 10문제를 모두 맞혔을 때 결과 화면 표시
+         */
+        function showGameResult() {
+            finalScoreEl.textContent = `최종 점수: ${totalScore} 점`;
+            gameOverOverlayEl.style.display = 'flex';
+
+            // --- PostMessage 코드 추가 ---
+            // 게임이 종료되고 최종 점수가 확정되었을 때
+            // 부모 창(사이트)으로 점수를 전송합니다.
+            const scoreMessage = {
+                type: 'game_score',
+                score: totalScore 
+            };
+            // window.parent는 이 HTML을 삽입한 부모 프레임을 의미합니다.
+            // '*'는 모든 도메인에 허용을 의미합니다. 
+            // 실제 배포 시에는 'https://coreeno.base44.app'와 같이 특정 도메인으로 제한하는 것이 좋습니다.
+            if (window.parent) {
+                window.parent.postMessage(scoreMessage, '*');
+            }
+            // --- 코드 추가 완료 ---
+        }
+
+
+        // --- 4. 이벤트 리스너 ---
+        
+        submitBtnEl.addEventListener('click', checkAnswer);
+        answerInputEl.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        restartBtnEl.addEventListener('click', startGame);
+
+        // --- 5. 게임 시작 ---
+        startGame();
+
+    </script>
+</body>
+</html>
+
+
+
