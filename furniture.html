@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Viewport 설정이 중요합니다. 모바일에서 너비를 올바르게 인식하도록 합니다. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>가구 초성 퀴즈</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
@@ -10,6 +11,9 @@
         /* --- 기본 스타일 (수정) --- */
         * {
             box-sizing: border-box; 
+            /* 모바일에서 터치 하이라이트 제거 (선택 사항이지만 권장)
+              -webkit-tap-highlight-color: transparent; 
+            */
         }
         
         html, body {
@@ -26,17 +30,24 @@
             display: flex;
             flex-direction: column; 
             justify-content: center; /* 수직 중앙 정렬 */
-            /* [수정] align-items: center; 제거 (가로 꽉 채우기) */
-            padding: 5px 2px; /* (축소) */
+            /* [!!!] 핵심 수정 지점
+              좌우 패딩(2px)을 제거합니다. 
+              이 패딩이 모바일 iframe 환경에서 너비 계산 오류를 일으킬 가능성이 높습니다.
+              수직 패딩(5px)은 유지합니다.
+            */
+            padding: 5px 0;
         }
 
         /* --- 게임 컨테이너 (수정) --- */
         #game-container {
             width: 100%;
-            /* [수정] max-width: 500px; 제거 */
+            /* max-width: 500px; 제거됨 */
             background-color: #ffffff;
             border-radius: 12px; 
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); 
+            /* 컨테이너 내부의 이 패딩(좌우 15px)이 
+              body 패딩 대신 좌우 여백 역할을 하게 됩니다. 
+            */
             padding: 10px 15px; 
             border: 1px solid #ddd;
             display: flex;
@@ -133,6 +144,8 @@
             font-weight: 700;
             color: #333;
             font-family: 'Noto Sans KR', sans-serif;
+            /* 모바일에서 확대 방지 */
+            -webkit-appearance: none;
         }
         #answer-input:focus { border-color: #6a1b9a; outline: none; }
         #answer-input[readonly] { caret-color: transparent; }
@@ -147,14 +160,19 @@
             border-radius: 6px; 
             cursor: pointer;
             transition: background-color 0.3s;
+            -webkit-appearance: none;
         }
         #submit-btn:hover { background-color: #4a148c; }
 
         /* --- 가상 키보드 (수정) --- */
         #virtual-keyboard {
             width: 100%;
-            /* [수정] max-width: 500px; 제거 */
+            /* max-width: 500px; 제거됨 */
             margin-top: 5px; 
+            /*
+              키보드 내부의 이 패딩(좌우 5px)이 
+              body 패딩 대신 좌우 여백 역할을 하게 됩니다.
+            */
             padding: 5px; 
             background-color: #e9ecef;
             border-radius: 8px; 
@@ -188,6 +206,7 @@
             
             box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
             transition: background-color 0.1s, transform 0.1s;
+            -webkit-appearance: none;
         }
         .kbd-key:active { background-color: #ddd; transform: translateY(1px); }
         
@@ -221,6 +240,9 @@
             text-align: center;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             animation: zoomIn 0.5s ease;
+            /* 좌우 잘림 방지를 위해 너비 제한 */
+            width: 90%;
+            max-width: 400px;
         }
         #game-over-box h2 { font-size: 2rem; color: #6a1b9a; margin-top: 0; } 
         #game-over-box p { font-size: 1.2rem; margin-bottom: 25px; } 
@@ -234,6 +256,7 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s;
+            -webkit-appearance: none;
         }
         #restart-btn:hover { background-color: #218838; }
         
@@ -483,7 +506,11 @@
             feedbackTimeoutEl.textContent = `시간 초과! 정답: ${correctAnswerWord}`;
             showInHintArea('timeout'); 
 
-            setTimeout(startGame, 2000); 
+            // [수정] 시간 초과 시 다음 문제로 바로 넘어가지 않고, 2초 후에 다음 문제 표시
+            setTimeout(() => {
+                currentQuestionIndex++; // 다음 문제로 인덱스 증가
+                displayQuestion(); // 다음 문제 표시
+            }, 2000);
         }
 
         function checkAnswer() {
