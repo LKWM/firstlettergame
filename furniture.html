@@ -27,8 +27,8 @@
             flex-direction: column; 
             justify-content: center; /* (수정) 수직 중앙 정렬 유지 */
             align-items: center;
-            padding-top: 5px; /* (추가) 상단에 약간의 여백 */
-            padding-bottom: 5px; /* (추가) 하단에 약간의 여백 */
+            padding-top: 5px; 
+            padding-bottom: 5px;
         }
 
         /* --- 게임 컨테이너 (수정) --- */
@@ -36,34 +36,35 @@
             width: 100%;
             max-width: 500px;
             background-color: #ffffff;
-            border-radius: 15px; /* (축소) */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* (축소) */
-            padding: 15px 20px; /* (축소) */
+            border-radius: 15px; 
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); 
+            padding: 15px 20px; 
             border: 1px solid #ddd;
             display: flex;
             flex-direction: column;
-            margin-left: 10px; /* (추가) 좌우 여백 */
-            margin-right: 10px; /* (추가) 좌우 여백 */
+            /* [수정] 좌우 여백 제거 (화면 잘림 오류 수정) */
+            /* margin-left: 10px; */
+            /* margin-right: 10px; */
         }
 
         /* --- 상태 표시줄 (수정) --- */
         #status-bar {
             display: flex;
             justify-content: space-between;
-            font-size: 1rem; /* (축소) */
+            font-size: 1rem; 
             font-weight: 700;
             color: #555;
-            margin-bottom: 10px; /* (축소) */
+            margin-bottom: 10px; 
         }
 
         /* --- 초성 (수정) --- */
         #choseong-display {
-            font-size: 3rem; /* (축소) */
+            font-size: 3rem; 
             font-weight: 700;
             color: #6a1b9a;
             letter-spacing: 10px;
-            margin-bottom: 10px; /* (축소) */
-            padding: 15px 0; /* (축소) */
+            margin-bottom: 10px; 
+            padding: 15px 0; 
             background-color: #f8f9fa;
             border-radius: 10px;
             text-align: center;
@@ -72,7 +73,7 @@
         /* --- 타이머 --- */
         #timer-bar-container {
             width: 100%;
-            height: 8px; /* (축소) */
+            height: 8px; 
             background-color: #e9ecef;
             border-radius: 4px;
             overflow: hidden;
@@ -87,27 +88,27 @@
 
         /* --- 힌트 영역 (수정) --- */
         #hint-area {
-            min-height: 100px; /* (축소) */
-            margin-top: 10px; /* (축소) */
+            min-height: 100px; 
+            margin-top: 10px; 
             display: flex;
             flex-direction: column; 
             justify-content: center;
             align-items: center;
             border: 2px dashed #ddd;
             border-radius: 10px;
-            padding: 8px; /* (축소) */
+            padding: 8px; 
             text-align: center;
         }
 
-        .hint-box { font-size: 0.9rem; color: #555; } /* (축소) */
-        #image-hint { font-size: 3rem; } /* (축소) */
+        .hint-box { font-size: 0.9rem; color: #555; } 
+        #image-hint { font-size: 3rem; } 
         #image-hint.hidden { display: none; }
 
         /* --- 피드백 메시지 (수정) --- */
         .feedback {
-            font-size: 1rem; /* (축소) */
+            font-size: 1rem; 
             font-weight: 700;
-            padding: 8px; /* (축소) */
+            padding: 8px; 
             display: none; 
             border-radius: 8px;
             text-align: center;
@@ -119,15 +120,15 @@
         
         /* --- 입력 영역 (수정) --- */
         #input-area {
-            margin-top: 10px; /* (축소) */
+            margin-top: 10px; 
             display: flex;
-            gap: 8px; /* (축소) */
+            gap: 8px; 
         }
 
         #answer-input {
             flex-grow: 1;
-            padding: 12px; /* (축소) */
-            font-size: 1.1rem; /* (축소) */
+            padding: 12px; 
+            font-size: 1.1rem; 
             border: 2px solid #ced4da;
             border-radius: 8px;
             transition: border-color 0.3s;
@@ -140,8 +141,8 @@
         #answer-input[readonly] { caret-color: transparent; }
 
         #submit-btn {
-            padding: 12px 20px; /* (축소) */
-            font-size: 1.1rem; /* (축소) */
+            padding: 12px 20px; 
+            font-size: 1.1rem; 
             font-weight: 700;
             background-color: #6a1b9a;
             color: white;
@@ -156,33 +157,33 @@
         #virtual-keyboard {
             width: 100%;
             max-width: 500px;
-            margin-top: 10px; /* (축소) */
-            padding: 8px; /* (축소) */
+            margin-top: 10px; 
+            padding: 8px; 
             background-color: #e9ecef;
             border-radius: 10px;
-            flex-shrink: 0; /* (추가) 키보드가 찌그러지지 않게 */
+            flex-shrink: 0; 
         }
         
         .kbd-row {
             display: flex;
             justify-content: center;
-            gap: 4px; /* (축소) */
-            margin-bottom: 4px; /* (축소) */
+            gap: 4px; 
+            margin-bottom: 4px; 
         }
         .kbd-row:last-child { margin-bottom: 0; }
 
         .kbd-key {
             font-family: 'Noto Sans KR', sans-serif;
-            font-size: 1rem; /* (축소) */
+            font-size: 1rem; 
             font-weight: 700;
             background-color: #ffffff;
             color: #333;
             border: none;
-            border-radius: 6px; /* (축소) */
-            padding: 10px 0; /* (축소) */
+            border-radius: 6px; 
+            padding: 10px 0; 
             flex-grow: 1; 
             flex-basis: 0;
-            min-width: 28px; /* (축소) */
+            min-width: 28px; 
             
             cursor: pointer;
             user-select: none;
@@ -197,7 +198,7 @@
             flex-grow: 1.5;
             background-color: #adb5bd;
             color: white;
-            font-size: 0.8rem; /* (축소) */
+            font-size: 0.8rem; 
         }
         .kbd-key.special:active { background-color: #868e96; }
         .kbd-key.shift-active { background-color: #a5b4fc; color: #1e3a8a; }
@@ -218,17 +219,17 @@
 
         #game-over-box {
             background-color: white;
-            padding: 30px 40px; /* (축소) */
-            border-radius: 15px; /* (축소) */
+            padding: 30px 40px; 
+            border-radius: 15px; 
             text-align: center;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             animation: zoomIn 0.5s ease;
         }
-        #game-over-box h2 { font-size: 2rem; color: #6a1b9a; margin-top: 0; } /* (축소) */
-        #game-over-box p { font-size: 1.2rem; margin-bottom: 25px; } /* (축소) */
+        #game-over-box h2 { font-size: 2rem; color: #6a1b9a; margin-top: 0; } 
+        #game-over-box p { font-size: 1.2rem; margin-bottom: 25px; } 
         #restart-btn {
-            padding: 12px 25px; /* (축소) */
-            font-size: 1.1rem; /* (축소) */
+            padding: 12px 25px; 
+            font-size: 1.1rem; 
             font-weight: 700;
             background-color: #28a745;
             color: white;
@@ -328,6 +329,7 @@
 
     <script>
         // --- 1. 데이터 ---
+        // [수정] '장롱' -> '옷장' (ㅇㅈ)으로 원복
         const questionBank = [
             { choseong: 'ㅊㄷ', answer: '침대', imageHint: '🛏️' },
             { choseong: 'ㅇㅈ', answer: '의자', imageHint: '🪑' },
@@ -335,7 +337,7 @@
             { choseong: 'ㅅㅌ', answer: '식탁', imageHint: '🍽️' }, 
             { choseong: 'ㅅㄹ', answer: '서랍', imageHint: '🗄️' }, 
             { choseong: 'ㅅㅍ', answer: '소파', imageHint: '🛋️' }, 
-            { choseong: 'ㅈㄹ', answer: '옷장', imageHint: '👚👕' }, 
+            { choseong: 'ㅇㅈ', answer: '옷장', imageHint: '👚👕' }, // [수정] '장롱(ㅈㄹ)' -> '옷장(ㅇㅈ)'
             { choseong: 'ㅊㄲㅇ', answer: '책꽂이', imageHint: '📚📚📚' }, 
             { choseong: 'ㄱㅇ', answer: '거울', imageHint: '🪞' }, 
             { choseong: 'ㅌㅈ', answer: '탁자', imageHint: '☕️🍵' }
@@ -556,28 +558,25 @@
             if (!key) return; 
             if (answerInputEl.disabled) return;
 
-            // --- [수정] keyVal 로직 변경 ---
             let keyVal;
-            const keyData = key.dataset.key; // 'ㅂ' 또는 'shift', 'del', 'enter'
+            const keyData = key.dataset.key; 
             
             if (keyData === 'shift') {
-                toggleShift(); // Shift 키는 토글만 함
-                return; // 글자 입력은 하지 않음
+                toggleShift(); 
+                return; 
             } 
             if (keyData === 'del') {
                 handleBackspace();
             } else if (keyData === 'enter') {
                 checkAnswer();
             } else {
-                // Shift가 눌린 상태인지 확인
                 if (isShifted) {
-                    keyVal = key.dataset.shift || key.dataset.key; // 'ㅃ' 또는 'ㅐ'
+                    keyVal = key.dataset.shift || key.dataset.key; 
                 } else {
-                    keyVal = key.dataset.key; // 'ㅂ' 또는 'ㅏ'
+                    keyVal = key.dataset.key; 
                 }
-                typeHangul(keyVal); // 'ㅂ' 또는 'ㅃ' 같은 실제 글자 값 전달
+                typeHangul(keyVal); 
             }
-            // --- [수정 완료] ---
             
             if (!isTouchDevice) {
                 answerInputEl.focus();
@@ -626,11 +625,9 @@
             const isJung = JUNGSEONG.includes(key); 
             const isJong = JONGSEONG.includes(key); 
 
-            // --- [수정] Shift 자동 풀림 로직 ---
             if (isShifted) {
                 toggleShift();
             }
-            // --- [수정 완료] ---
 
             if (!lastChar || !decompose(lastChar)) {
                 if (CHOSEONG.includes(lastChar) && isJung) {
@@ -740,9 +737,6 @@
             }
         }
         
-        /**
-         * Shift 키 토글 로직 (v3 - 버그 수정)
-         */
         let isShifted = false;
         const shiftKeyEl = document.querySelector('.kbd-key[data-key="shift"]');
         const shiftableKeyEls = document.querySelectorAll('.kbd-key[data-shift]');
@@ -752,17 +746,14 @@
             shiftKeyEl.classList.toggle('shift-active', isShifted);
             
             shiftableKeyEls.forEach(keyEl => {
-                 // data-key는 'ㅂ' (불변)
                  const originalKey = keyEl.dataset.key; 
-                 // data-shift는 'ㅃ' (불변)
                  const shiftKey = keyEl.dataset.shift; 
                  
                  if (isShifted) {
-                     keyEl.textContent = shiftKey; // 보이는 것만 'ㅃ'로
+                     keyEl.textContent = shiftKey; 
                  } else {
-                     keyEl.textContent = originalKey; // 보이는 것만 'ㅂ'로
+                     keyEl.textContent = originalKey; 
                  }
-                 // data-key 속성 자체는 절대 건드리지 않음
             });
         }
 
