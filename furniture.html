@@ -3,58 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>가구 초성 퀴즈</title> <!-- Title 변경 -->
+    <title>가구 초성 퀴즈</title>
     <style>
-        /* Noto Sans KR 글꼴 가져오기 */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
 
-        body {
+        /* --- 기본 스타일 --- */
+        * {
+            box-sizing: border-box; /* 레이아웃 계산을 쉽게 함 */
+        }
+        
+        html, body {
+            height: 100%; /* 가상 키보드가 있어도 전체 화면을 유지 */
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #f5f5f5; /* 연한 회색 배경 */
             color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
-            overflow: hidden; /* 스크롤 방지 */
+            /* 모바일에서 오버스크롤(바운스) 방지 */
+            overflow: hidden; 
         }
 
+        body {
+            display: flex;
+            flex-direction: column; /* 컨텐츠를 세로로 정렬 */
+            justify-content: center; /* (수정) 중앙 정렬 */
+            align-items: center;
+        }
+
+        /* --- 게임 컨테이너 --- */
         #game-container {
-            width: 90%;
+            width: 100%;
             max-width: 500px;
             background-color: #ffffff;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 25px 30px;
-            text-align: center;
-            border: 2px solid #ddd; /* 연한 테두리 */
+            padding: 20px 25px;
+            border: 2px solid #ddd;
+            
+            /* (수정) Flexbox 자식 요소로 변경 */
+            display: flex;
+            flex-direction: column;
         }
 
-        /* --- 상태 표시줄 (문제 번호, 점수) --- */
+        /* --- 상태 표시줄 --- */
         #status-bar {
             display: flex;
             justify-content: space-between;
             font-size: 1.1rem;
             font-weight: 700;
-            color: #555; /* 회색 톤 */
-            margin-bottom: 20px;
-        }
-
-        #question-area {
-            margin-bottom: 20px;
+            color: #555;
+            margin-bottom: 15px; /* 간격 조정 */
         }
 
         /* --- 초성 --- */
         #choseong-display {
-            font-size: 4rem;
+            font-size: 3.5rem; /* 약간 줄임 */
             font-weight: 700;
             color: #6a1b9a; /* 보라색 계열 */
             letter-spacing: 10px;
             margin-bottom: 15px;
             padding: 20px 0;
-            background-color: #f8f9fa; /* 연한 회색 배경 */
+            background-color: #f8f9fa;
             border-radius: 10px;
+            text-align: center; /* 추가 */
         }
 
         /* --- 타이머 --- */
@@ -69,41 +79,46 @@
         #timer-bar {
             width: 100%;
             height: 100%;
-            background-color: #4caf50; /* 초록색 (2점) */
-            transition: width 1s linear; /* 타이머가 부드럽게 줄어듦 */
+            background-color: #4caf50; /* 초록색 */
+            transition: width 1s linear;
         }
 
-        /* --- 힌트 영역 --- */
+        /* --- 힌트 영역 (수정) --- */
         #hint-area {
-            min-height: 150px;
-            margin-top: 20px;
+            min-height: 120px; /* 고정 높이 유지 */
+            margin-top: 15px;
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* (수정) 힌트/피드백을 세로로 쌓음 */
             justify-content: center;
             align-items: center;
             border: 2px dashed #ddd;
             border-radius: 10px;
-            padding: 15px;
+            padding: 10px;
+            text-align: center;
         }
 
-        .hint-box {
-            font-size: 1.1rem;
-            color: #555;
-        }
+        .hint-box { font-size: 1rem; color: #555; }
+        #image-hint { font-size: 4rem; } /* 약간 줄임 */
+        #image-hint.hidden { display: none; }
 
-        /* 이미지 힌트 (이모지) */
-        #image-hint {
-            font-size: 5rem;
+        /* --- 피드백 메시지 (수정) --- */
+        .feedback {
+            font-size: 1.1rem; /* 힌트 박스에 맞게 폰트 조정 */
+            font-weight: 700;
+            padding: 10px; /* 힌트 박스에 맞게 패딩 조정 */
+            display: none; /* JS로 컨트롤 */
+            border-radius: 10px;
+            /* margin-top: 10px; <-- 제거됨 */
+            text-align: center;
+            width: 100%; /* 힌트 영역을 꽉 채움 */
         }
+        .feedback.correct { color: #28a745; background-color: #e6f7ec; }
+        .feedback.wrong { color: #dc3545; background-color: #fdeeee; }
+        .feedback.info { color: #555; background-color: #f0f0f0; }
         
-        /* 힌트 초기 상태 (숨김) */
-        #image-hint.hidden {
-            display: none;
-        }
-
         /* --- 입력 영역 --- */
         #input-area {
-            margin-top: 25px;
+            margin-top: 15px; /* 간격 조정 */
             display: flex;
             gap: 10px;
         }
@@ -115,6 +130,10 @@
             border: 2px solid #ced4da;
             border-radius: 10px;
             transition: border-color 0.3s;
+            text-align: center; /* 입력값 중앙 정렬 */
+            font-weight: 700;
+            color: #333;
+            font-family: 'Noto Sans KR', sans-serif; /* 한글 폰트 적용 */
         }
 
         #answer-input:focus {
@@ -122,50 +141,89 @@
             outline: none;
         }
 
+        /* 모바일에서 네이티브 키보드 숨길 시 커서(깜박임)도 숨김 */
+        #answer-input[readonly] {
+            caret-color: transparent;
+        }
+
         #submit-btn {
             padding: 15px 25px;
             font-size: 1.2rem;
             font-weight: 700;
-            background-color: #6a1b9a; /* 보라색 계열 */
+            background-color: #6a1b9a;
             color: white;
             border: none;
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.3s;
         }
+        #submit-btn:hover { background-color: #4a148c; }
 
-        #submit-btn:hover {
-            background-color: #4a148c;
-        }
-
-        /* --- 피드백 메시지 (정답/오답/시간초과) --- */
-        .feedback {
-            font-size: 1.5rem;
-            font-weight: 700;
-            padding: 20px;
-            display: none; /* 초기 숨김 */
-            border-radius: 10px;
+        /* --- 가상 키보드 --- */
+        #virtual-keyboard {
+            width: 100%;
+            max-width: 500px;
             margin-top: 15px;
-        }
-
-        .feedback.correct {
-            color: #28a745;
-            background-color: #e6f7ec;
-        }
-
-        .feedback.wrong {
-            color: #dc3545;
-            background-color: #fdeeee;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 10px;
         }
         
-        .feedback.info {
-            color: #555;
-            background-color: #f0f0f0;
+        .kbd-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px; /* 키 사이 간격 */
+            margin-bottom: 6px;
+        }
+        .kbd-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .kbd-key {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background-color: #ffffff;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 0; /* 세로 크기 */
+            flex-grow: 1; /* 키가 균등하게 꽉 차도록 */
+            flex-basis: 0; /* flex-grow를 위한 기본값 */
+            min-width: 30px; /* 최소 너비 */
+            
+            cursor: pointer;
+            user-select: none; /* 모바일에서 클릭 시 하이라이트 방지 */
+            -webkit-user-select: none; /* Safari */
+            
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.1s, transform 0.1s;
+        }
+
+        .kbd-key:active {
+            background-color: #ddd;
+            transform: translateY(1px); /* 클릭 효과 */
         }
         
+        /* 특수 키 (지우기, 확인) */
+        .kbd-key.special {
+            flex-grow: 1.5; /* 더 넓게 */
+            background-color: #adb5bd;
+            color: white;
+            font-size: 0.9rem; /* [수정] 글자 크기 조정 */
+        }
+        .kbd-key.special:active {
+            background-color: #868e96;
+        }
+        /* [추가] Shift 활성화 시 스타일 */
+        .kbd-key.shift-active {
+            background-color: #a5b4fc; /* Shift 눌림 효과 */
+            color: #1e3a8a;
+        }
+
         /* --- 게임 종료 오버레이 --- */
         #game-over-overlay {
-            display: none; /* 초기 숨김 */
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -183,20 +241,10 @@
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            animation: zoomIn 0.5s ease; /* 나타날 때 줌인 효과 */
+            animation: zoomIn 0.5s ease;
         }
-
-        #game-over-box h2 {
-            font-size: 2.5rem;
-            color: #6a1b9a; /* 보라색 계열 */
-            margin-top: 0;
-        }
-        
-        #game-over-box p {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-        }
-
+        #game-over-box h2 { font-size: 2.5rem; color: #6a1b9a; margin-top: 0; }
+        #game-over-box p { font-size: 1.5rem; margin-bottom: 30px; }
         #restart-btn {
             padding: 15px 30px;
             font-size: 1.3rem;
@@ -208,28 +256,48 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        
-        #restart-btn:hover {
-            background-color: #218838;
-        }
+        #restart-btn:hover { background-color: #218838; }
         
         @keyframes zoomIn {
             from { transform: scale(0.5); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
 
+        /* 모바일 화면 대응 (가로 모드 등) */
+        @media (max-height: 700px) and (orientation: landscape) {
+            /* 가로 모드에서는 키보드가 너무 커지지 않도록 조정 */
+            #virtual-keyboard {
+                max-width: 450px;
+                margin-top: 10px;
+                padding: 5px;
+            }
+            .kbd-key {
+                padding: 8px 0;
+                font-size: 1rem;
+            }
+            .kbd-row { gap: 4px; margin-bottom: 4px; }
+            #game-container { padding: 15px 20px; }
+        }
+        @media (max-width: 380px) {
+             /* 아주 작은 세로 화면 */
+            #choseong-display { font-size: 2.8rem; }
+            #image-hint { font-size: 3rem; }
+            .kbd-key { 
+                font-size: 0.9rem; /* [수정] */
+                padding: 10px 0; 
+            }
+        }
+
     </style>
 </head>
 <body>
 
+    <!-- 게임 컨텐츠 -->
     <div id="game-container">
-        <!-- 게임 상태 표시줄 -->
         <div id="status-bar">
             <span id="question-counter">문제 1 / 10</span>
             <span id="total-score">총 점수: 0 점</span>
         </div>
-
-        <!-- 퀴즈 영역 -->
         <div id="question-area">
             <div id="choseong-display">ㅊㄷ</div>
             <div id="timer-bar-container">
@@ -237,16 +305,17 @@
             </div>
         </div>
 
-        <!-- 힌트 영역 -->
+        <!-- (수정) 힌트 영역: 피드백 메시지를 이 안으로 이동 -->
         <div id="hint-area">
+            <!-- 힌트 컨텐츠 -->
             <div id="image-hint" class="hint-box hidden"></div>
             <div id="initial-hint-text" class="hint-box">10초 후에 이미지 힌트가 나옵니다. (총 20초)</div>
+            
+            <!-- 피드백 메시지 (이동됨) -->
+            <div id="feedback-correct" class="feedback correct">정답입니다! (+0점)</div>
+            <div id="feedback-wrong" class="feedback wrong">틀렸습니다. 다시 시도하세요.</div>
+            <div id="feedback-timeout" class="feedback info">시간 초과! 정답: </div>
         </div>
-        
-        <!-- 정답/오답/시간초과 피드백 -->
-        <div id="feedback-correct" class="feedback correct">정답입니다! (+0점)</div>
-        <div id="feedback-wrong" class="feedback wrong">틀렸습니다. 다시 시도하세요.</div>
-        <div id="feedback-timeout" class="feedback info">시간 초과! 정답: </div>
 
         <!-- 정답 입력 영역 -->
         <div id="input-area">
@@ -255,10 +324,51 @@
         </div>
     </div>
     
-    <!-- 게임 종료 화면 -->
+    <!-- 가상 키보드 HTML (2벌식 쿼티) -->
+    <div id="virtual-keyboard">
+        <div class="kbd-row" id="kbd-row-1">
+            <button class="kbd-key" data-key="ㅂ" data-shift="ㅃ">ㅂ</button>
+            <button class="kbd-key" data-key="ㅈ" data-shift="ㅉ">ㅈ</button>
+            <button class="kbd-key" data-key="ㄷ" data-shift="ㄸ">ㄷ</button>
+            <button class="kbd-key" data-key="ㄱ" data-shift="ㄲ">ㄱ</button>
+            <button class="kbd-key" data-key="ㅅ" data-shift="ㅆ">ㅅ</button>
+            <button class="kbd-key" data-key="ㅛ">ㅛ</button>
+            <button class="kbd-key" data-key="ㅕ">ㅕ</button>
+            <button class="kbd-key" data-key="ㅑ">ㅑ</button>
+            <button class="kbd-key" data-key="ㅐ" data-shift="ㅒ">ㅐ</button>
+            <button class="kbd-key" data-key="ㅔ" data-shift="ㅖ">ㅔ</button>
+        </div>
+        <div class="kbd-row" id="kbd-row-2">
+            <button class="kbd-key" data-key="ㅁ">ㅁ</button>
+            <button class="kbd-key" data-key="ㄴ">ㄴ</button>
+            <button class="kbd-key" data-key="ㅇ">ㅇ</button>
+            <button class="kbd-key" data-key="ㄹ">ㄹ</button>
+            <button class="kbd-key" data-key="ㅎ">ㅎ</button>
+            <button class="kbd-key" data-key="ㅗ">ㅗ</button>
+            <button class="kbd-key" data-key="ㅓ">ㅓ</button>
+            <button class="kbd-key" data-key="ㅏ">ㅏ</button>
+            <button class="kbd-key" data-key="ㅣ">ㅣ</button>
+        </div>
+        <div class="kbd-row" id="kbd-row-3">
+            <button class="kbd-key special" data-key="shift">Shift</button>
+            <button class="kbd-key" data-key="ㅋ">ㅋ</button>
+            <button class="kbd-key" data-key="ㅌ">ㅌ</button>
+            <button class="kbd-key" data-key="ㅊ">ㅊ</button>
+            <button class="kbd-key" data-key="ㅍ">ㅍ</button>
+            <button class="kbd-key" data-key="ㅠ">ㅠ</button>
+            <button class="kbd-key" data-key="ㅜ">ㅜ</button>
+            <button class="kbd-key" data-key="ㅡ">ㅡ</button>
+        </div>
+        <div class="kbd-row" id="kbd-row-4">
+            <button class="kbd-key special" data-key="del">지우기</button>
+            <button class="kbd-key special" data-key="enter">확인</button>
+        </div>
+    </div>
+    
+    <!-- 게임 종료 화면 (변동 없음) -->
     <div id="game-over-overlay">
         <div id="game-over-box">
-            <h2>게임 종료!</h2> <!-- Title 변경 -->
+            <h2>게임 종료!</h2>
             <p id="final-score">최종 점수: 0 점</p>
             <button id="restart-btn">다시 시작하기</button>
         </div>
@@ -266,53 +376,52 @@
 
     <script>
         // --- 1. 데이터 ---
-        // 가구 테마 문제 10개
+        // *** (수정) '옷장' -> '장롱'으로 변경 (ㅇㅈ 중복 버그 수정)
         const questionBank = [
             { choseong: 'ㅊㄷ', answer: '침대', imageHint: '🛏️' },
             { choseong: 'ㅇㅈ', answer: '의자', imageHint: '🪑' },
-            { choseong: 'ㅊㅅ', answer: '책상', imageHint: '🧑‍💻📒✏️' }, // Person at desk
-            { choseong: 'ㅅㅌ', answer: '식탁', imageHint: '🍽️' }, // Dining
-            { choseong: 'ㅅㄹ', answer: '서랍', imageHint: '🗄️' }, // Drawers
-            { choseong: 'ㅅㅍ', answer: '소파', imageHint: '🛋️' },
-            { choseong: 'ㅇㅈ', answer: '옷장', imageHint: '👚👕 ' }, // Wardrobe/Closet door
-            { choseong: 'ㅊㄲㅇ', answer: '책꽂이', imageHint: '📚📚📚' }, // Books
-            { choseong: 'ㄱㅇ', answer: '거울', imageHint: '🪞' },
-            { choseong: 'ㅌㅈ', answer: '탁자', imageHint: '☕️🍵' }  // Coffee table
+            { choseong: 'ㅊㅅ', answer: '책상', imageHint: '🧑‍💻📒✏️' }, // 책상
+            { choseong: 'ㅅㅌ', answer: '식탁', imageHint: '🍽️' }, // 식탁
+            { choseong: 'ㅅㄹ', answer: '서랍', imageHint: '🗄️' }, // 서랍
+            { choseong: 'ㅅㅍ', answer: '소파', imageHint: '🛋️' }, // 소파
+            { choseong: 'ㅈㄹ', answer: '장롱', imageHint: '👚👕 ' }, // '옷장(ㅇㅈ)' -> '장롱(ㅈㄹ)'
+            { choseong: 'ㅊㄲㅇ', answer: '책꽂이', imageHint: '📚📚📚' }, // 책꽂이
+            { choseong: 'ㄱㅇ', answer: '거울', imageHint: '🪞' }, // 거울
+            { choseong: 'ㅌㅈ', answer: '탁자', imageHint: '☕️🍵' }  // 탁자
         ];
 
-        let shuffledQuestions = []; // 랜덤으로 섞인 문제들
-        let currentQuestionIndex = 0; // 현재 문제 번호
-        let totalScore = 0; // 총 점수
-        let currentPoints = 2; // 현재 문제의 획득 가능 점수 (기본 2점)
-        let questionTimer; // 타이머 (setInterval)
-        let secondsElapsed; // 현재 문제 경과 시간
+        let shuffledQuestions = [];
+        let currentQuestionIndex = 0;
+        let totalScore = 0;
+        let currentPoints = 2;
+        let questionTimer;
+        let secondsElapsed;
 
         // --- 2. HTML 요소 가져오기 ---
         const questionCounterEl = document.getElementById('question-counter');
         const totalScoreEl = document.getElementById('total-score');
         const choseongDisplayEl = document.getElementById('choseong-display');
         const timerBarEl = document.getElementById('timer-bar');
-        
-        const hintAreaEl = document.getElementById('hint-area');
         const initialHintTextEl = document.getElementById('initial-hint-text');
         const imageHintEl = document.getElementById('image-hint');
-
         const answerInputEl = document.getElementById('answer-input');
         const submitBtnEl = document.getElementById('submit-btn');
         
+        // (수정) 피드백 요소 (HTML DOM 구조는 동일하게 유지, JS로 제어)
         const feedbackCorrectEl = document.getElementById('feedback-correct');
         const feedbackWrongEl = document.getElementById('feedback-wrong');
-        const feedbackTimeoutEl = document.getElementById('feedback-timeout'); // 시간 초과 피드백
+        const feedbackTimeoutEl = document.getElementById('feedback-timeout');
         
         const gameOverOverlayEl = document.getElementById('game-over-overlay');
         const finalScoreEl = document.getElementById('final-score');
         const restartBtnEl = document.getElementById('restart-btn');
+        
+        const virtualKeyboardEl = document.getElementById('virtual-keyboard');
 
         // --- 3. 핵심 기능 함수 ---
 
-        /**
-         * 배열을 랜덤으로 섞는 함수 (Fisher-Yates Shuffle)
-         */
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -321,62 +430,75 @@
             return array;
         }
 
-        /**
-         * 게임 시작 (또는 재시작) 함수
-         */
         function startGame() {
             totalScore = 0;
             currentQuestionIndex = 0;
             shuffledQuestions = shuffleArray([...questionBank]); 
-            
             totalScoreEl.textContent = `총 점수: 0 점`;
             gameOverOverlayEl.style.display = 'none';
-            
-            // 모든 피드백 숨기기
-            feedbackWrongEl.style.display = 'none';
-            feedbackCorrectEl.style.display = 'none';
-            feedbackTimeoutEl.style.display = 'none';
-            
             displayQuestion();
         }
 
-        /**
-         * 현재 문제 인덱스에 맞는 문제를 화면에 표시
-         */
-        function displayQuestion() {
-            // 힌트 및 피드백 숨기기
-            resetHints();
+        // (수정) 힌트/피드백 영역 관리 함수
+        function showInHintArea(elementToShow) {
+            // 모든 힌트/피드백 요소 숨기기
+            initialHintTextEl.style.display = 'none';
+            imageHintEl.classList.add('hidden');
             feedbackCorrectEl.style.display = 'none';
             feedbackWrongEl.style.display = 'none';
             feedbackTimeoutEl.style.display = 'none';
-            
-            // 입력창/버튼 활성화
+
+            // 요청된 요소만 표시
+            if (elementToShow === 'initial') {
+                initialHintTextEl.style.display = 'block';
+            } else if (elementToShow === 'image') {
+                imageHintEl.classList.remove('hidden');
+            } else if (elementToShow === 'correct') {
+                feedbackCorrectEl.style.display = 'block';
+            } else if (elementToShow === 'wrong') {
+                feedbackWrongEl.style.display = 'block';
+            } else if (elementToShow === 'timeout') {
+                feedbackTimeoutEl.style.display = 'block';
+            }
+        }
+        
+        // (수정) resetHints가 힌트 영역 관리 함수 사용
+        function resetHints() {
+            showInHintArea('initial'); // 힌트/피드백 영역 초기화
+        }
+
+        // (수정) displayQuestion이 힌트 영역 관리 함수 사용
+        function displayQuestion() {
+            resetHints(); // 이것이 모든 피드백을 숨기고 힌트 초기화
+
             answerInputEl.value = '';
             answerInputEl.disabled = false;
             submitBtnEl.disabled = false;
-            answerInputEl.focus(); // 입력창에 포커스
+            
+            if (isTouchDevice) {
+                answerInputEl.readOnly = true;
+                answerInputEl.style.caretColor = 'transparent';
+            } else {
+                answerInputEl.readOnly = false;
+                answerInputEl.style.caretColor = 'auto';
+                answerInputEl.focus();
+            }
 
-            // 게임 종료 조건: 10문제를 모두 맞혔을 때
             if (currentQuestionIndex >= 10) {
                 showGameResult();
                 return;
             }
 
-            // 점수 및 시간 초기화
-            currentPoints = 2; // 기본 점수를 2점으로 설정
+            currentPoints = 2;
             secondsElapsed = 0;
-            
-            // 타이머 바 초기화
             timerBarEl.style.transition = 'none'; 
             timerBarEl.style.width = '100%';
-            timerBarEl.style.backgroundColor = '#4caf50'; // 2점 (초록)
+            timerBarEl.style.backgroundColor = '#4caf50'; 
             
-            // 문제 정보 표시
             const question = shuffledQuestions[currentQuestionIndex];
             choseongDisplayEl.textContent = question.choseong;
             questionCounterEl.textContent = `문제 ${currentQuestionIndex + 1} / 10`;
 
-            // 타이머 시작
             clearInterval(questionTimer); 
             questionTimer = setInterval(updateTimer, 1000);
             
@@ -384,177 +506,362 @@
                 timerBarEl.style.transition = 'width 1s linear';
             }, 100);
         }
-        
-        /**
-         * 힌트 영역을 초기 상태로 되돌림
-         */
-        function resetHints() {
-            imageHintEl.classList.add('hidden');
-            initialHintTextEl.style.display = 'block';
-        }
 
-        /**
-         * 1초마다 호출되는 타이머 함수
-         */
         function updateTimer() {
             secondsElapsed++;
-            
-            const totalTime = 20; // 총 시간 20초
-            
+            const totalTime = 20;
             let timeRemainingPercent = 100 - (secondsElapsed / totalTime) * 100;
             timerBarEl.style.width = `${timeRemainingPercent}%`;
 
-            // 1) 10초 경과: 2점 -> 1점, 이미지 힌트
             if (secondsElapsed === 10) {
-                currentPoints = 1; // 점수를 1점으로 감점
+                currentPoints = 1;
                 showImageHint();
-                timerBarEl.style.backgroundColor = '#ffc107'; // 1점 (주황)
+                timerBarEl.style.backgroundColor = '#ffc107';
             }
-            // 2) 20초 경과: 시간 초과
             else if (secondsElapsed === 20) {
-                currentPoints = 0; // 점수 0점
-                clearInterval(questionTimer); // 타이머 중지
-                handleTimeout(); // 시간 초과 처리 함수 호출
+                currentPoints = 0;
+                clearInterval(questionTimer);
+                handleTimeout();
             }
         }
 
-        /**
-         * 이미지 힌트 표시
-         */
+        // (수정) showImageHint가 힌트 영역 관리 함수 사용
         function showImageHint() {
             const question = shuffledQuestions[currentQuestionIndex];
             imageHintEl.textContent = question.imageHint;
-            imageHintEl.classList.remove('hidden');
-            initialHintTextEl.style.display = 'none'; // 초기 텍스트 숨기기
+            showInHintArea('image'); // 이미지 힌트 표시
         }
 
-        /**
-         * 시간 초과 처리 함수
-         */
+        // (수정) handleTimeout이 힌트 영역 관리 함수 사용
         function handleTimeout() {
-            // 입력창/버튼 비활성화
             answerInputEl.disabled = true;
             submitBtnEl.disabled = true;
             
-            // 힌트 숨기기
-            resetHints();
-            initialHintTextEl.style.display = 'none';
+            const correctAnswerWord = shuffledQuestions[currentQuestionIndex].answer;
+            feedbackTimeoutEl.textContent = `시간 초과! 정답: ${correctAnswerWord}`;
+            showInHintArea('timeout'); // 시간 초과 피드백 표시
 
-            // 정답 보여주기
-            const correctAnswer = shuffledQuestions[currentQuestionIndex].answer;
-            feedbackTimeoutEl.textContent = `시간 초과! 정답은 "${correctAnswer}" 입니다.`;
-            feedbackTimeoutEl.style.display = 'block';
-
-            // 2초 후 게임 재시작
-            setTimeout(() => {
-                startGame();
-            }, 2000);
+            setTimeout(startGame, 2000); // startGame이 힌트 영역 리셋
         }
 
-        /**
-         * "확인" 버튼 클릭 또는 엔터 시 정답 확인
-         */
+        // (수정) checkAnswer가 힌트 영역 관리 함수 사용
         function checkAnswer() {
             const userInput = answerInputEl.value.trim();
             const correctAnswer = shuffledQuestions[currentQuestionIndex].answer;
 
-            if (!userInput) return; // 입력값이 없으면 무시
+            if (!userInput) return; 
 
             // 1. 정답인 경우
             if (userInput === correctAnswer) {
-                // 정답! 타이머 중지.
                 clearInterval(questionTimer);
-                
                 answerInputEl.disabled = true;
                 submitBtnEl.disabled = true;
 
-                totalScore += currentPoints; // 점수 추가
+                totalScore += currentPoints;
                 totalScoreEl.textContent = `총 점수: ${totalScore} 점`;
                 
-                // 정답 피드백
                 feedbackCorrectEl.textContent = `정답! +${currentPoints}점`;
-                feedbackCorrectEl.style.display = 'block';
-                feedbackWrongEl.style.display = 'none'; // 오답 피드백 숨기기
+                showInHintArea('correct'); // 정답 피드백
 
-                currentQuestionIndex++; // 다음 문제로
+                currentQuestionIndex++;
                 
-                // 1.5초 후 다음 문제
-                setTimeout(displayQuestion, 1500);
+                setTimeout(displayQuestion, 1500); // displayQuestion이 힌트 영역 리셋
             }
             // 2. 오답인 경우
             else {
-                // 오답! 타이머는 계속.
                 feedbackWrongEl.textContent = '틀렸습니다. 다시 시도하세요.';
-                feedbackWrongEl.style.display = 'block';
-                answerInputEl.select(); // 입력창 텍스트 선택
+                showInHintArea('wrong'); // 오답 피드백
+                
+                // --- [사용자 요청] 오답 시 입력값 삭제 ---
+                answerInputEl.value = ''; 
+                
+                // (선택) PC인 경우 삭제 후 다시 포커스
+                if (!isTouchDevice) {
+                    answerInputEl.focus();
+                }
+                // --- [수정 완료] ---
 
-                // 1초 후 오답 메시지 숨기기
                 setTimeout(() => {
-                    feedbackWrongEl.style.display = 'none';
+                    // (수정) 시간이 10초 지났는지에 따라 힌트 복원
+                    if (secondsElapsed >= 10) {
+                        showInHintArea('image');
+                    } else {
+                        showInHintArea('initial');
+                    }
                 }, 1000);
             }
         }
 
-        /**
-         * 10문제를 모두 맞혔을 때 결과 화면 표시
-         */
         function showGameResult() {
             finalScoreEl.textContent = `최종 점수: ${totalScore} 점`;
             gameOverOverlayEl.style.display = 'flex';
 
-            // --- PostMessage 코드 ---
-            // 게임이 종료되고 최종 점수가 확정되었을 때
-            // 부모 창(사이트)으로 점수를 전송합니다.
             const scoreMessage = {
                 type: 'game_score',
                 score: totalScore 
             };
-            // window.parent는 이 HTML을 삽입한 부모 프레임을 의미합니다.
-            // 실제 배포 시에는 'https://coreeno.base44.app'와 같이 특정 도메인으로 제한하는 것이 좋습니다.
             if (window.parent) {
                 window.parent.postMessage(scoreMessage, '*');
             }
         }
 
-
         // --- 4. 이벤트 리스너 ---
         
-        // "확인" 버튼 클릭
         submitBtnEl.addEventListener('click', checkAnswer);
-
-        // 엔터 키 입력
         answerInputEl.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 checkAnswer();
             }
         });
-
-        // "다시 시작" 버튼 클릭
         restartBtnEl.addEventListener('click', startGame);
-
         
-        // --- [수정/추가] 모바일 키보드 스크롤 방지 로직 ---
+        virtualKeyboardEl.addEventListener('click', function(e) {
+            const key = e.target.closest('.kbd-key');
+            if (!key) return; 
+            if (answerInputEl.disabled) return;
+
+            // --- [수정] keyVal 로직 변경 ---
+            let keyVal;
+            if (key.dataset.key === 'shift') {
+                keyVal = 'shift';
+            } else if (key.dataset.key === 'del') {
+                keyVal = 'del';
+            } else if (key.dataset.key === 'enter') {
+                keyVal = 'enter';
+            } else {
+                // Shift 상태를 확인하여 data-shift 또는 data-key 값을 가져옴
+                keyVal = isShifted ? (key.dataset.shift || key.dataset.key) : key.dataset.key;
+            }
+            // --- [수정 완료] ---
+
+            if (keyVal === 'enter') {
+                checkAnswer();
+            } else if (keyVal === 'del') {
+                handleBackspace();
+            } else if (keyVal === 'shift') {
+                toggleShift(); // Shift 키 자체를 눌렀을 때만 토글
+            } else {
+                typeHangul(keyVal); // 'ㅂ' 또는 'ㅃ' 같은 실제 글자 값 전달
+            }
+            
+            if (!isTouchDevice) {
+                answerInputEl.focus();
+            }
+        });
+        
+        // --- (수정) 한글 IME (조합/분해) 로직 ---
+
+        // (1) 한글 상수
+        const CHOSEONG = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+        const JUNGSEONG = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
+        const JONGSEONG = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+        
+        // (2) 복합 자음/모음 (키 입력 기준)
+        const COMPLEX_JAMO_KEY = {
+            'ㄱㅅ': 'ㄳ', 'ㄴㅈ': 'ㄵ', 'ㄴㅎ': 'ㄶ', 'ㄹㄱ': 'ㄺ', 'ㄹㅁ': 'ㄻ', 'ㄹㅂ': 'ㄼ', 'ㄹㅅ': 'ㄽ', 'ㄹㅌ': 'ㄾ', 'ㄹㅍ': 'ㄿ', 'ㄹㅎ': 'ㅀ', 'ㅂㅅ': 'ㅄ',
+            'ㅗㅏ': 'ㅘ', 'ㅗㅐ': 'ㅙ', 'ㅗㅣ': 'ㅚ', 'ㅜㅓ': 'ㅝ', 'ㅜㅔ': 'ㅞ', 'ㅜㅣ': 'ㅟ', 'ㅡㅣ': 'ㅢ'
+        };
+        
+        // (3) 복합 자음/모음 분해 (삭제 기준)
+        const DECOMPOSE_COMPLEX_JAMO = {
+            'ㄳ': ['ㄱ', 'ㅅ'], 'ㄵ': ['ㄴ', 'ㅈ'], 'ㄶ': ['ㄴ', 'ㅎ'], 'ㄺ': ['ㄹ', 'ㄱ'], 'ㄻ': ['ㄹ', 'ㅁ'], 'ㄼ': ['ㄹ', 'ㅂ'], 'ㄽ': ['ㄹ', 'ㅅ'], 'ㄾ': ['ㄹ', 'ㅌ'], 'ㄿ': ['ㄹ', 'ㅍ'], 'ㅀ': ['ㄹ', 'ㅎ'], 'ㅄ': ['ㅂ', 'ㅅ'],
+            'ㅘ': ['ㅗ', 'ㅏ'], 'ㅙ': ['ㅗ', 'ㅐ'], 'ㅚ': ['ㅗ', 'ㅣ'], 'ㅝ': ['ㅜ', 'ㅓ'], 'ㅞ': ['ㅜ', 'ㅔ'], 'ㅟ': ['ㅜ', 'ㅣ'], 'ㅢ': ['ㅡ', 'ㅣ']
+        };
+
+        // (4) 글자 코드 계산
+        const HANGUL_START = 0xAC00; // '가'
+        const HANGUL_END = 0xD7A3;   // '힣'
         
         /**
-         * 뷰포트를 강제로 (0, 0)으로 스크롤하는 함수
+         * 초/중/종성 인덱스로 한글 글자 만들기
          */
-        function scrollToTop() {
-            // 브라우저의 자동 스크롤이 실행된 직후에
-            // 덮어쓰기 위해 짧은 지연(timeout)을 줍니다.
-            setTimeout(() => {
-                window.scrollTo(0, 0);
-            }, 100);
+        function compose(choIdx, jungIdx, jongIdx) {
+            return String.fromCharCode(HANGUL_START + (choIdx * 21 * 28) + (jungIdx * 28) + jongIdx);
         }
 
-        // 입력창에 포커스가 갈 때(키보드가 올라올 때)
-        answerInputEl.addEventListener('focus', scrollToTop);
+        /**
+         * 한글 글자를 초/중/종성 인덱스로 분해
+         */
+        function decompose(char) {
+            const code = char.charCodeAt(0);
+            if (code < HANGUL_START || code > HANGUL_END) {
+                return null; // 한글 음절이 아님
+            }
+            const unicode = code - HANGUL_START;
+            const jongIdx = unicode % 28;
+            const jungIdx = ((unicode - jongIdx) / 28) % 21;
+            const choIdx = Math.floor(((unicode - jongIdx) / 28) / 21);
+            return [choIdx, jungIdx, jongIdx];
+        }
         
-        // (선택적) 키보드가 사라질 때도 화면을 원복합니다.
-        answerInputEl.addEventListener('blur', () => {
-             window.scrollTo(0, 0);
-        });
-        // --- 수정/추가 완료 ---
+        /**
+         * 가상 키보드 입력 처리 (v2)
+         */
+        function typeHangul(key) {
+            const val = answerInputEl.value;
+            const lastChar = val.slice(-1);
+            
+            const isJung = JUNGSEONG.includes(key); // 새로 입력된 키가 모음인가?
+            const isJong = JONGSEONG.includes(key); // 새로 입력된 키가 받침 가능 자음인가? (초성도 겸함)
 
+            // Shift가 눌린 상태였다면 원래대로 복원
+            if (isShifted) toggleShift();
+
+            // 1. 입력창이 비었거나, 마지막 글자가 완성형 한글이 아닌 경우 (예: 'ㅅ')
+            if (!lastChar || !decompose(lastChar)) {
+                // 1a. 마지막 글자가 자음(예: 'ㅅ')이고, 새 키가 모음(예: 'ㅗ')일 때
+                if (CHOSEONG.includes(lastChar) && isJung) {
+                    const choIdx = CHOSEONG.indexOf(lastChar);
+                    const jungIdx = JUNGSEONG.indexOf(key);
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, jungIdx, 0); // '소'
+                }
+                // 1b. 그 외 (예: 'ㅅ' + 'ㄱ' -> 'ㅅㄱ', 'ㅗ' + 'ㅏ' -> 'ㅗㅏ')
+                else {
+                    answerInputEl.value += key;
+                }
+                return;
+            }
+
+            // --- 2. 마지막 글자가 완성형 한글일 때 (예: '소', '솝') ---
+            const [choIdx, jungIdx, jongIdx] = decompose(lastChar);
+
+            // 2a. [초+중] 상태 (받침 없음. 예: '소')
+            if (jongIdx === 0) {
+                const jung = JUNGSEONG[jungIdx];
+                const combinedJung = COMPLEX_JAMO_KEY[jung + key]; // 복합 모음 시도 (예: 'ㅗ' + 'ㅏ' -> 'ㅘ')
+                
+                // 2a-i. 복합 모음 조합 (예: '오' + 'ㅏ' -> '와')
+                if (isJung && combinedJung) {
+                    const newJungIdx = JUNGSEONG.indexOf(combinedJung);
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, newJungIdx, 0);
+                }
+                // 2a-ii. 받침 추가 (예: '소' + 'ㅍ' -> '솦')
+                else if (isJong) {
+                    const newJongIdx = JONGSEONG.indexOf(key);
+                    if (newJongIdx > 0) { // JONGSEONG[0]는 ''(빈값)이므로 제외
+                         answerInputEl.value = val.slice(0, -1) + compose(choIdx, jungIdx, newJongIdx);
+                    } else {
+                         answerInputEl.value += key;
+                    }
+                }
+                // 2a-iii. 그 외 (예: '소' + 'ㅏ' -> '소ㅏ')
+                else {
+                    answerInputEl.value += key;
+                }
+            }
+            // 2b. [초+중+종] 상태 (받침 있음. 예: '솦')
+            else {
+                const jong = JONGSEONG[jongIdx];
+                const combinedJong = COMPLEX_JAMO_KEY[jong + key]; // 복합 받침 시도 (예: 'ㄹ' + 'ㄱ' -> 'ㄺ')
+
+                // 2b-i. 새 키가 모음일 때 (예: '솦' + 'ㅏ' -> '소' + '파')
+                if (isJung) {
+                    let lastCharJong, newCharCho; // 받침 분리
+                    const decomposedJong = DECOMPOSE_COMPLEX_JAMO[jong]; // (예: 'ㄺ' -> ['ㄹ', 'ㄱ'])
+                    
+                    if (decomposedJong) { // 복합 받침인 경우
+                        lastCharJong = decomposedJong[0];
+                        newCharCho = decomposedJong[1];
+                    } else { // 홑받침인 경우
+                        lastCharJong = '';
+                        newCharCho = jong;
+                    }
+
+                    const newLastJongIdx = JONGSEONG.indexOf(lastCharJong);
+                    const newCharChoIdx = CHOSEONG.indexOf(newCharCho);
+                    const newCharJungIdx = JUNGSEONG.indexOf(key);
+
+                    answerInputEl.value = val.slice(0, -1) + 
+                                        compose(choIdx, jungIdx, newLastJongIdx) + 
+                                        compose(newCharChoIdx, newCharJungIdx, 0);
+                }
+                // 2b-ii. 새 키가 자음일 때 (복합 받침 시도. 예: '식' + 'ㅅ' -> '싟')
+                else if (isJong && combinedJong && JONGSEONG.includes(combinedJong)) {
+                    const newJongIdx = JONGSEONG.indexOf(combinedJong);
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, jungIdx, newJongIdx);
+                }
+                // 2b-iii. 그 외 (예: '솦' + 'ㅋ' -> '솦ㅋ')
+                else {
+                    answerInputEl.value += key;
+                }
+            }
+        }
+        
+        /**
+         * 한글 지우기 (Backspace) 처리 (v2)
+         */
+        function handleBackspace() {
+            const val = answerInputEl.value;
+            if (val.length === 0) return;
+
+            const lastChar = val.slice(-1);
+            const decomposed = decompose(lastChar);
+            
+            // 1. 마지막 글자가 한글 음절이 아닌 경우 (예: 'ㅅ')
+            if (!decomposed) {
+                answerInputEl.value = val.slice(0, -1);
+                return;
+            }
+
+            const [choIdx, jungIdx, jongIdx] = decomposed;
+            
+            // 2. [초+중+종] 상태 (예: '삶')
+            if (jongIdx > 0) {
+                const jong = JONGSEONG[jongIdx];
+                const decomposedJong = DECOMPOSE_COMPLEX_JAMO[jong]; // (예: 'ㄺ' -> ['ㄹ', 'ㄱ'])
+
+                // 2a. 복합 받침 분해 (예: '삶' -> '살')
+                if (decomposedJong) {
+                    const newJongIdx = JONGSEONG.indexOf(decomposedJong[0]); // 'ㄹ'
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, jungIdx, newJongIdx);
+                } 
+                // 2b. 홑 받침 제거 (예: '살' -> '사')
+                else {
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, jungIdx, 0);
+                }
+            }
+            // 3. [초+중] 상태 (예: '사', '와')
+            else {
+                const jung = JUNGSEONG[jungIdx];
+                const decomposedJung = DECOMPOSE_COMPLEX_JAMO[jung]; // (예: 'ㅘ' -> ['ㅗ', 'ㅏ'])
+
+                // 3a. 복합 모음 분해 (예: '와' -> '오')
+                if (decomposedJung) {
+                    const newJungIdx = JUNGSEONG.indexOf(decomposedJung[0]); // 'ㅗ'
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, newJungIdx, 0);
+                }
+                // 3b. 홑 모음 제거 (예: '오' -> 'ㅇ')
+                else {
+                    answerInputEl.value = val.slice(0, -1) + CHOSEONG[choIdx];
+                }
+            }
+        }
+        
+        /**
+         * Shift 키 토글 로직 (v3 - 버그 수정)
+         */
+        let isShifted = false;
+        const shiftKeyEl = document.querySelector('.kbd-key[data-key="shift"]');
+        const shiftableKeyEls = document.querySelectorAll('.kbd-key[data-shift]');
+        
+        function toggleShift() {
+            isShifted = !isShifted;
+            shiftKeyEl.classList.toggle('shift-active', isShifted);
+            
+            shiftableKeyEls.forEach(keyEl => {
+                 // data-key는 'ㅂ' (불변)
+                 const originalKey = keyEl.dataset.key; 
+                 // data-shift는 'ㅃ' (불변)
+                 const shiftKey = keyEl.dataset.shift; 
+                 
+                 if (isShifted) {
+                     keyEl.textContent = shiftKey; // 보이는 것만 'ㅃ'로
+                 } else {
+                     keyEl.textContent = originalKey; // 보이는 것만 'ㅂ'로
+                 }
+                 // data-key 속성 자체는 절대 건드리지 않음
+            });
+        }
 
         // --- 5. 게임 시작 ---
         startGame();
@@ -562,4 +869,3 @@
     </script>
 </body>
 </html>
-
