@@ -25,57 +25,54 @@
         body {
             display: flex;
             flex-direction: column; 
-            justify-content: center; /* (수정) 수직 중앙 정렬 유지 */
-            align-items: center;
-            padding-top: 5px; 
-            padding-bottom: 5px;
+            justify-content: center; /* 수직 중앙 정렬 */
+            /* [수정] align-items: center; 제거 (가로 꽉 채우기) */
+            padding: 5px 2px; /* (축소) */
         }
 
         /* --- 게임 컨테이너 (수정) --- */
         #game-container {
             width: 100%;
-            max-width: 500px;
+            /* [수정] max-width: 500px; 제거 */
             background-color: #ffffff;
-            border-radius: 15px; 
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); 
-            padding: 15px 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); 
+            padding: 10px 15px; 
             border: 1px solid #ddd;
             display: flex;
             flex-direction: column;
-            /* [수정] 좌우 여백 제거 (화면 잘림 오류 수정) */
-            /* margin-left: 10px; */
-            /* margin-right: 10px; */
+            margin-bottom: 5px; 
         }
 
         /* --- 상태 표시줄 (수정) --- */
         #status-bar {
             display: flex;
             justify-content: space-between;
-            font-size: 1rem; 
+            font-size: 0.9rem; 
             font-weight: 700;
             color: #555;
-            margin-bottom: 10px; 
+            margin-bottom: 8px; 
         }
 
         /* --- 초성 (수정) --- */
         #choseong-display {
-            font-size: 3rem; 
+            font-size: 2.5rem; 
             font-weight: 700;
             color: #6a1b9a;
             letter-spacing: 10px;
-            margin-bottom: 10px; 
-            padding: 15px 0; 
+            margin-bottom: 8px; 
+            padding: 10px 0; 
             background-color: #f8f9fa;
-            border-radius: 10px;
+            border-radius: 8px; 
             text-align: center;
         }
 
         /* --- 타이머 --- */
         #timer-bar-container {
             width: 100%;
-            height: 8px; 
+            height: 6px; 
             background-color: #e9ecef;
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
         }
 
@@ -88,29 +85,29 @@
 
         /* --- 힌트 영역 (수정) --- */
         #hint-area {
-            min-height: 100px; 
-            margin-top: 10px; 
+            min-height: 80px; 
+            margin-top: 8px; 
             display: flex;
             flex-direction: column; 
             justify-content: center;
             align-items: center;
             border: 2px dashed #ddd;
-            border-radius: 10px;
-            padding: 8px; 
+            border-radius: 8px; 
+            padding: 5px; 
             text-align: center;
         }
 
-        .hint-box { font-size: 0.9rem; color: #555; } 
-        #image-hint { font-size: 3rem; } 
+        .hint-box { font-size: 0.85rem; color: #555; } 
+        #image-hint { font-size: 2.5rem; } 
         #image-hint.hidden { display: none; }
 
         /* --- 피드백 메시지 (수정) --- */
         .feedback {
-            font-size: 1rem; 
+            font-size: 0.9rem; 
             font-weight: 700;
-            padding: 8px; 
+            padding: 5px; 
             display: none; 
-            border-radius: 8px;
+            border-radius: 6px; 
             text-align: center;
             width: 100%;
         }
@@ -120,17 +117,17 @@
         
         /* --- 입력 영역 (수정) --- */
         #input-area {
-            margin-top: 10px; 
+            margin-top: 8px; 
             display: flex;
-            gap: 8px; 
+            gap: 5px; 
         }
 
         #answer-input {
             flex-grow: 1;
-            padding: 12px; 
-            font-size: 1.1rem; 
+            padding: 10px; 
+            font-size: 1rem; 
             border: 2px solid #ced4da;
-            border-radius: 8px;
+            border-radius: 6px; 
             transition: border-color 0.3s;
             text-align: center; 
             font-weight: 700;
@@ -141,13 +138,13 @@
         #answer-input[readonly] { caret-color: transparent; }
 
         #submit-btn {
-            padding: 12px 20px; 
-            font-size: 1.1rem; 
+            padding: 10px 15px; 
+            font-size: 1rem; 
             font-weight: 700;
             background-color: #6a1b9a;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px; 
             cursor: pointer;
             transition: background-color 0.3s;
         }
@@ -156,34 +153,34 @@
         /* --- 가상 키보드 (수정) --- */
         #virtual-keyboard {
             width: 100%;
-            max-width: 500px;
-            margin-top: 10px; 
-            padding: 8px; 
+            /* [수정] max-width: 500px; 제거 */
+            margin-top: 5px; 
+            padding: 5px; 
             background-color: #e9ecef;
-            border-radius: 10px;
+            border-radius: 8px; 
             flex-shrink: 0; 
         }
         
         .kbd-row {
             display: flex;
             justify-content: center;
-            gap: 4px; 
-            margin-bottom: 4px; 
+            gap: 3px; 
+            margin-bottom: 3px; 
         }
         .kbd-row:last-child { margin-bottom: 0; }
 
         .kbd-key {
             font-family: 'Noto Sans KR', sans-serif;
-            font-size: 1rem; 
+            font-size: 0.9rem; 
             font-weight: 700;
             background-color: #ffffff;
             color: #333;
             border: none;
-            border-radius: 6px; 
-            padding: 10px 0; 
+            border-radius: 5px; 
+            padding: 8px 0; 
             flex-grow: 1; 
             flex-basis: 0;
-            min-width: 28px; 
+            min-width: 26px; 
             
             cursor: pointer;
             user-select: none;
@@ -198,7 +195,7 @@
             flex-grow: 1.5;
             background-color: #adb5bd;
             color: white;
-            font-size: 0.8rem; 
+            font-size: 0.7rem; 
         }
         .kbd-key.special:active { background-color: #868e96; }
         .kbd-key.shift-active { background-color: #a5b4fc; color: #1e3a8a; }
@@ -491,11 +488,29 @@
 
         function checkAnswer() {
             const userInput = answerInputEl.value.trim();
-            const correctAnswer = shuffledQuestions[currentQuestionIndex].answer;
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            const correctAnswer = currentQuestion.answer;
+            
+            let isAnswerCorrect = false;
 
             if (!userInput) return; 
+            
+            // [수정] '의자'와 '옷장' 모두 정답으로 처리
+            // 현재 초성이 'ㅇㅈ'인 경우
+            if (currentQuestion.choseong === 'ㅇㅈ') {
+                // '의자' 또는 '옷장' 둘 다 정답으로 인정
+                if (userInput === '의자' || userInput === '옷장') {
+                    isAnswerCorrect = true;
+                }
+            } else {
+                // 그 외의 경우, 정답과 정확히 일치하는지 확인
+                if (userInput === correctAnswer) {
+                    isAnswerCorrect = true;
+                }
+            }
 
-            if (userInput === correctAnswer) {
+
+            if (isAnswerCorrect) {
                 clearInterval(questionTimer);
                 answerInputEl.disabled = true;
                 submitBtnEl.disabled = true;
