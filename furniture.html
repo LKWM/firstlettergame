@@ -40,7 +40,13 @@
 
         /* --- 게임 컨테이너 (수정) --- */
         #game-container {
-            width: 100%;
+            /* [!!!] 수정: width: 100% 제거.
+               body(flex-direction: column)의 자식은 
+               기본값(align-items: stretch)에 의해 
+               자동으로 너비가 100%로 설정됩니다. 
+               명시적 100%가 모바일 뷰포트에서 문제를 일으킬 수 있습니다.
+            */
+            /* width: 100%; */
             /* max-width: 500px; 제거됨 */
             background-color: #ffffff;
             border-radius: 12px; 
@@ -174,7 +180,10 @@
         /* --- 가상 키보드 (수정) --- */
         /* [!!!] 수정: 누락되었던 #virtual-keyboard 선택자를 다시 추가합니다. */
         #virtual-keyboard {
-            width: 100%;
+            /* [!!!] 수정: width: 100% 제거. 
+               game-container와 동일한 이유. 
+            */
+            /* width: 100%; */
             /* max-width: 500px; 제거됨 */
             margin-top: 5px; 
             /*
