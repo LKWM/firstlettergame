@@ -146,6 +146,10 @@
             font-family: 'Noto Sans KR', sans-serif;
             /* 모바일에서 확대 방지 */
             -webkit-appearance: none;
+            /* [!!!] 수정: flex 아이템이 부모 너비를 초과하지 않도록 
+               브라우저 기본 min-width를 무시하고 강제로 축소될 수 있게 합니다. */
+            min-width: 0; 
+            flex-shrink: 1; /* 명시적으로 축소 가능하도록 설정 */
         }
         #answer-input:focus { border-color: #6a1b9a; outline: none; }
         #answer-input[readonly] { caret-color: transparent; }
@@ -161,10 +165,14 @@
             cursor: pointer;
             transition: background-color 0.3s;
             -webkit-appearance: none;
+            /* [!!!] 수정: 버튼은 고정 너비를 가지며, 
+               flex 아이템 축소 시 너비가 줄어들지 않도록 합니다. */
+            flex-shrink: 0; 
         }
         #submit-btn:hover { background-color: #4a148c; }
-
+ 
         /* --- 가상 키보드 (수정) --- */
+        /* [!!!] 수정: 누락되었던 #virtual-keyboard 선택자를 다시 추가합니다. */
         #virtual-keyboard {
             width: 100%;
             /* max-width: 500px; 제거됨 */
