@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- [!!!] 수정: 제목 변경 -->
-    <title>학교 초성 퀴즈</title>
+    <title>스포츠 초성 퀴즈</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
 
@@ -16,7 +15,7 @@
         html, body {
             height: 100%; /* 화면 높이를 100%로 고정 */
             max-height: 100%; /* 스크롤 방지 */
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Noto+Sans+KR', sans-serif;
             background-color: #f5f5f5; 
             color: #333;
             margin: 0;
@@ -265,7 +264,7 @@
             <span id="total-score">총 점수: 0 점</span>
         </div>
         <div id="question-area">
-            <div id="choseong-display">ㅎㅅ</div>
+            <div id="choseong-display">ㅊㄱ</div>
             <div id="timer-bar-container">
                 <div id="timer-bar"></div>
             </div>
@@ -273,7 +272,6 @@
 
         <div id="hint-area">
             <div id="image-hint" class="hint-box hidden"></div>
-            <!-- [!!!] 수정: 힌트 텍스트 변경 -->
             <div id="initial-hint-text" class="hint-box">10초 후에 이모지 힌트가 나옵니다. (총 20초)</div>
             
             <div id="feedback-correct" class="feedback correct">정답입니다! (+0점)</div>
@@ -339,7 +337,6 @@
 
     <script>
         // --- 1. 데이터 ---
-        // [!!!] 수정: '학교' 퀴즈 데이터로 변경
         const questionBank = [
             { choseong: 'ㅎㅅ', answer: '학생', imageHint: '🧑‍🎓' },
             { choseong: 'ㅅㅅㄴ', answer: '선생님', imageHint: '👨‍🏫' },
@@ -496,8 +493,8 @@
             feedbackTimeoutEl.textContent = `시간 초과! 정답: ${correctAnswerWord}`;
             showInHintArea('timeout'); 
 
-            currentQuestionIndex++;
-            setTimeout(displayQuestion, 2000); 
+            // [!!!] 수정: 2초 후 다음 문제가 아닌, 게임을 처음부터 다시 시작 (startGame)
+            setTimeout(startGame, 2000); 
         }
 
         function checkAnswer() {
@@ -509,7 +506,6 @@
 
             if (!userInput) return; 
             
-            // [!!!] 수정: 중복 답안 인정 로직 없음 (정확한 1:1 매칭)
             if (userInput === correctAnswer) {
                 isAnswerCorrect = true;
             }
@@ -762,7 +758,7 @@
         const shiftableKeyEls = document.querySelectorAll('.kbd-key[data-shift]');
         
         function toggleShift() {
-            isShifted = !isSifted;
+            isShifted = !isShifted;
             shiftKeyEl.classList.toggle('shift-active', isShifted);
             
             shiftableKeyEls.forEach(keyEl => {
