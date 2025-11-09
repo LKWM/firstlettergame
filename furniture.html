@@ -2,24 +2,20 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport 설정이 중요합니다. 모바일에서 너비를 올바르게 인식하도록 합니다. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>가구 초성 퀴즈</title>
+    <title>스포츠 초성 퀴즈</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
 
         /* --- 기본 스타일 (수정) --- */
         * {
             box-sizing: border-box; 
-            /* 모바일에서 터치 하이라이트 제거 (선택 사항이지만 권장)
-              -webkit-tap-highlight-color: transparent; 
-            */
         }
         
         html, body {
             height: 100%; /* 화면 높이를 100%로 고정 */
             max-height: 100%; /* 스크롤 방지 */
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Noto+Sans+KR', sans-serif;
             background-color: #f5f5f5; 
             color: #333;
             margin: 0;
@@ -30,30 +26,14 @@
             display: flex;
             flex-direction: column; 
             justify-content: center; /* 수직 중앙 정렬 */
-            /* [!!!] 핵심 수정 지점
-              좌우 패딩(2px)을 제거합니다. 
-              이 패딩이 모바일 iframe 환경에서 너비 계산 오류를 일으킬 가능성이 높습니다.
-              수직 패딩(5px)은 유지합니다.
-            */
             padding: 5px 0;
         }
 
         /* --- 게임 컨테이너 (수정) --- */
         #game-container {
-            /* [!!!] 수정: width: 100% 제거.
-               body(flex-direction: column)의 자식은 
-               기본값(align-items: stretch)에 의해 
-               자동으로 너비가 100%로 설정됩니다. 
-               명시적 100%가 모바일 뷰포트에서 문제를 일으킬 수 있습니다.
-            */
-            /* width: 100%; */
-            /* max-width: 500px; 제거됨 */
             background-color: #ffffff;
             border-radius: 12px; 
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); 
-            /* 컨테이너 내부의 이 패딩(좌우 15px)이 
-              body 패딩 대신 좌우 여백 역할을 하게 됩니다. 
-            */
             padding: 10px 15px; 
             border: 1px solid #ddd;
             display: flex;
@@ -141,6 +121,7 @@
 
         #answer-input {
             flex-grow: 1;
+            min-width: 0;
             padding: 10px; 
             font-size: 1rem; 
             border: 2px solid #ced4da;
@@ -150,17 +131,15 @@
             font-weight: 700;
             color: #333;
             font-family: 'Noto Sans KR', sans-serif;
-            /* 모바일에서 확대 방지 */
             -webkit-appearance: none;
-            /* [!!!] 수정: flex 아이템이 부모 너비를 초과하지 않도록 
-               브라우저 기본 min-width를 무시하고 강제로 축소될 수 있게 합니다. */
-            min-width: 0; 
-            flex-shrink: 1; /* 명시적으로 축소 가능하도록 설정 */
+            -moz-appearance: none;
+            appearance: none;
         }
         #answer-input:focus { border-color: #6a1b9a; outline: none; }
         #answer-input[readonly] { caret-color: transparent; }
 
         #submit-btn {
+            flex-shrink: 0;
             padding: 10px 15px; 
             font-size: 1rem; 
             font-weight: 700;
@@ -171,25 +150,14 @@
             cursor: pointer;
             transition: background-color 0.3s;
             -webkit-appearance: none;
-            /* [!!!] 수정: 버튼은 고정 너비를 가지며, 
-               flex 아이템 축소 시 너비가 줄어들지 않도록 합니다. */
-            flex-shrink: 0; 
+            -moz-appearance: none;
+            appearance: none;
         }
         #submit-btn:hover { background-color: #4a148c; }
- 
+
         /* --- 가상 키보드 (수정) --- */
-        /* [!!!] 수정: 누락되었던 #virtual-keyboard 선택자를 다시 추가합니다. */
         #virtual-keyboard {
-            /* [!!!] 수정: width: 100% 제거. 
-               game-container와 동일한 이유. 
-            */
-            /* width: 100%; */
-            /* max-width: 500px; 제거됨 */
             margin-top: 5px; 
-            /*
-              키보드 내부의 이 패딩(좌우 5px)이 
-              body 패딩 대신 좌우 여백 역할을 하게 됩니다.
-            */
             padding: 5px; 
             background-color: #e9ecef;
             border-radius: 8px; 
@@ -224,6 +192,8 @@
             box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
             transition: background-color 0.1s, transform 0.1s;
             -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
         .kbd-key:active { background-color: #ddd; transform: translateY(1px); }
         
@@ -257,7 +227,6 @@
             text-align: center;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             animation: zoomIn 0.5s ease;
-            /* 좌우 잘림 방지를 위해 너비 제한 */
             width: 90%;
             max-width: 400px;
         }
@@ -274,6 +243,8 @@
             cursor: pointer;
             transition: background-color 0.3s;
             -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
         #restart-btn:hover { background-color: #218838; }
         
@@ -293,7 +264,7 @@
             <span id="total-score">총 점수: 0 점</span>
         </div>
         <div id="question-area">
-            <div id="choseong-display">ㅊㄷ</div>
+            <div id="choseong-display">ㅊㄱ</div>
             <div id="timer-bar-container">
                 <div id="timer-bar"></div>
             </div>
@@ -301,7 +272,7 @@
 
         <div id="hint-area">
             <div id="image-hint" class="hint-box hidden"></div>
-            <div id="initial-hint-text" class="hint-box">10초 후에 이미지 힌트가 나옵니다. (총 20초)</div>
+            <div id="initial-hint-text" class="hint-box">10초 후에 이모지 힌트가 나옵니다. (총 20초)</div>
             
             <div id="feedback-correct" class="feedback correct">정답입니다! (+0점)</div>
             <div id="feedback-wrong" class="feedback wrong">틀렸습니다. 다시 시도하세요.</div>
@@ -314,7 +285,7 @@
         </div>
     </div>
     
-    <!-- 가상 키보드 HTML -->
+    <!-- 가상 키보드 HTML (이전과 동일) -->
     <div id="virtual-keyboard">
         <div class="kbd-row" id="kbd-row-1">
             <button class="kbd-key" data-key="ㅂ" data-shift="ㅃ">ㅂ</button>
@@ -340,7 +311,6 @@
             <button class="kbd-key" data-key="ㅣ">ㅣ</button>
         </div>
         <div class="kbd-row" id="kbd-row-3">
-            <!-- [!!!] 수정: Shift 키에서 'special' 클래스 제거 -->
             <button class="kbd-key" data-key="shift">Shift</button>
             <button class="kbd-key" data-key="ㅋ">ㅋ</button>
             <button class="kbd-key" data-key="ㅌ">ㅌ</button>
@@ -349,11 +319,9 @@
             <button class="kbd-key" data-key="ㅠ">ㅠ</button>
             <button class="kbd-key" data-key="ㅜ">ㅜ</button>
             <button class="kbd-key" data-key="ㅡ">ㅡ</button>
-            <!-- [!!!] 수정: '지우기' 버튼을 4열에서 3열 우측 끝으로 이동 -->
             <button class="kbd-key special" data-key="del">지우기</button>
         </div>
         <div class="kbd-row" id="kbd-row-4">
-            <!-- [!!!] 수정: '지우기' 버튼 제거 -->
             <button class="kbd-key special" data-key="enter">확인</button>
         </div>
     </div>
@@ -369,7 +337,6 @@
 
     <script>
         // --- 1. 데이터 ---
-        // [수정] '장롱' -> '옷장' (ㅇㅈ)으로 원복
         const questionBank = [
             { choseong: 'ㅊㄷ', answer: '침대', imageHint: '🛏️' },
             { choseong: 'ㅇㅈ', answer: '의자', imageHint: '🪑' },
@@ -377,7 +344,7 @@
             { choseong: 'ㅅㅌ', answer: '식탁', imageHint: '🍽️' }, 
             { choseong: 'ㅅㄹ', answer: '서랍', imageHint: '🗄️' }, 
             { choseong: 'ㅅㅍ', answer: '소파', imageHint: '🛋️' }, 
-            { choseong: 'ㅇㅈ', answer: '옷장', imageHint: '👚👕' }, // [수정] '장롱(ㅈㄹ)' -> '옷장(ㅇㅈ)'
+            { choseong: 'ㅇㅈ', answer: '옷장', imageHint: '👚👕' }, 
             { choseong: 'ㅊㄲㅇ', answer: '책꽂이', imageHint: '📚📚📚' }, 
             { choseong: 'ㄱㅇ', answer: '거울', imageHint: '🪞' }, 
             { choseong: 'ㅌㅈ', answer: '탁자', imageHint: '☕️🍵' }
@@ -526,11 +493,8 @@
             feedbackTimeoutEl.textContent = `시간 초과! 정답: ${correctAnswerWord}`;
             showInHintArea('timeout'); 
 
-            // [수정] 시간 초과 시 다음 문제로 바로 넘어가지 않고, 2초 후에 다음 문제 표시
-            setTimeout(() => {
-                currentQuestionIndex++; // 다음 문제로 인덱스 증가
-                displayQuestion(); // 다음 문제 표시
-            }, 2000);
+            // [!!!] 수정: 2초 후 다음 문제가 아닌, 게임을 처음부터 다시 시작 (startGame)
+            setTimeout(startGame, 2000); 
         }
 
         function checkAnswer() {
@@ -542,18 +506,8 @@
 
             if (!userInput) return; 
             
-            // [수정] '의자'와 '옷장' 모두 정답으로 처리
-            // 현재 초성이 'ㅇㅈ'인 경우
-            if (currentQuestion.choseong === 'ㅇㅈ') {
-                // '의자' 또는 '옷장' 둘 다 정답으로 인정
-                if (userInput === '의자' || userInput === '옷장') {
-                    isAnswerCorrect = true;
-                }
-            } else {
-                // 그 외의 경우, 정답과 정확히 일치하는지 확인
-                if (userInput === correctAnswer) {
-                    isAnswerCorrect = true;
-                }
+            if (userInput === correctAnswer) {
+                isAnswerCorrect = true;
             }
 
 
@@ -746,8 +700,8 @@
                     const newCharJungIdx = JUNGSEONG.indexOf(key);
 
                     answerInputEl.value = val.slice(0, -1) + 
-                                        compose(choIdx, jungIdx, newLastJongIdx) + 
-                                        compose(newCharChoIdx, newCharJungIdx, 0);
+                                          compose(choIdx, jungIdx, newLastJongIdx) + 
+                                          compose(newCharChoIdx, newCharJungIdx, 0);
                 }
                 else if (isJong && combinedJong && JONGSEONG.includes(combinedJong)) {
                     const newJongIdx = JONGSEONG.indexOf(combinedJong);
@@ -812,9 +766,9 @@
                  const shiftKey = keyEl.dataset.shift; 
                  
                  if (isShifted) {
-                     keyEl.textContent = shiftKey; 
+                      keyEl.textContent = shiftKey; 
                  } else {
-                     keyEl.textContent = originalKey; 
+                      keyEl.textContent = originalKey; 
                  }
             });
         }
