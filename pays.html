@@ -2,10 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <!-- [!!!] 수정: 뷰포트 설정 (모바일 최적화) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- [!!!] 수정: 제목 변경 -->
-    <title>국가 초성 퀴즈</title>
+    <title>스포츠 초성 퀴즈</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
 
@@ -17,7 +15,7 @@
         html, body {
             height: 100%; /* 화면 높이를 100%로 고정 */
             max-height: 100%; /* 스크롤 방지 */
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Noto+Sans+KR', sans-serif;
             background-color: #f5f5f5; 
             color: #333;
             margin: 0;
@@ -28,14 +26,11 @@
             display: flex;
             flex-direction: column; 
             justify-content: center; /* 수직 중앙 정렬 */
-            /* [수정] align-items: center; 제거 (가로 꽉 채우기) */
-            /* [!!!] 수정: 좌우 패딩 0으로 고정 (잘림 방지) */
             padding: 5px 0;
         }
 
         /* --- 게임 컨테이너 (수정) --- */
         #game-container {
-            /* [!!!] 수정: width: 100% 제거 (flex-stretch로 대체) */
             background-color: #ffffff;
             border-radius: 12px; 
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); 
@@ -126,7 +121,6 @@
 
         #answer-input {
             flex-grow: 1;
-            /* [!!!] 수정: flex 아이템 축소 시 너비 0 허용 (버튼 밀림 방지) */
             min-width: 0;
             padding: 10px; 
             font-size: 1rem; 
@@ -137,7 +131,6 @@
             font-weight: 700;
             color: #333;
             font-family: 'Noto Sans KR', sans-serif;
-            /* [!!!] 수정: 모바일 기본 스타일 제거 */
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -146,7 +139,6 @@
         #answer-input[readonly] { caret-color: transparent; }
 
         #submit-btn {
-            /* [!!!] 수정: flex 아이템 축소 방지 (버튼 밀림 방지) */
             flex-shrink: 0;
             padding: 10px 15px; 
             font-size: 1rem; 
@@ -157,7 +149,6 @@
             border-radius: 6px; 
             cursor: pointer;
             transition: background-color 0.3s;
-            /* [!!!] 수정: 모바일 기본 스타일 제거 */
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -166,7 +157,6 @@
 
         /* --- 가상 키보드 (수정) --- */
         #virtual-keyboard {
-            /* [!!!] 수정: width: 100% 제거 (flex-stretch로 대체) */
             margin-top: 5px; 
             padding: 5px; 
             background-color: #e9ecef;
@@ -201,7 +191,6 @@
             
             box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
             transition: background-color 0.1s, transform 0.1s;
-            /* [!!!] 수정: 모바일 기본 스타일 제거 */
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -238,7 +227,6 @@
             text-align: center;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             animation: zoomIn 0.5s ease;
-            /* [!!!] 수정: 모바일 팝업 너비 제한 */
             width: 90%;
             max-width: 400px;
         }
@@ -254,7 +242,6 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s;
-            /* [!!!] 수정: 모바일 기본 스타일 제거 */
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -277,7 +264,7 @@
             <span id="total-score">총 점수: 0 점</span>
         </div>
         <div id="question-area">
-            <div id="choseong-display">ㅎㄱ</div>
+            <div id="choseong-display">ㅊㄱ</div>
             <div id="timer-bar-container">
                 <div id="timer-bar"></div>
             </div>
@@ -285,7 +272,7 @@
 
         <div id="hint-area">
             <div id="image-hint" class="hint-box hidden"></div>
-            <div id="initial-hint-text" class="hint-box">10초 후에 국기 힌트가 나옵니다. (총 20초)</div>
+            <div id="initial-hint-text" class="hint-box">10초 후에 이모지 힌트가 나옵니다. (총 20초)</div>
             
             <div id="feedback-correct" class="feedback correct">정답입니다! (+0점)</div>
             <div id="feedback-wrong" class="feedback wrong">틀렸습니다. 다시 시도하세요.</div>
@@ -298,7 +285,7 @@
         </div>
     </div>
     
-    <!-- 가상 키보드 HTML -->
+    <!-- 가상 키보드 HTML (이전과 동일) -->
     <div id="virtual-keyboard">
         <div class="kbd-row" id="kbd-row-1">
             <button class="kbd-key" data-key="ㅂ" data-shift="ㅃ">ㅂ</button>
@@ -307,7 +294,7 @@
             <button class="kbd-key" data-key="ㄱ" data-shift="ㄲ">ㄱ</button>
             <button class="kbd-key" data-key="ㅅ" data-shift="ㅆ">ㅅ</button>
             <button class="kbd-key" data-key="ㅛ">ㅛ</button>
-            <button classkbd-key" data-key="ㅕ">ㅕ</button>
+            <button class="kbd-key" data-key="ㅕ">ㅕ</button>
             <button class="kbd-key" data-key="ㅑ">ㅑ</button>
             <button class="kbd-key" data-key="ㅐ" data-shift="ㅒ">ㅐ</button>
             <button class="kbd-key" data-key="ㅔ" data-shift="ㅖ">ㅔ</button>
@@ -324,7 +311,6 @@
             <button class="kbd-key" data-key="ㅣ">ㅣ</button>
         </div>
         <div class="kbd-row" id="kbd-row-3">
-            <!-- [!!!] 수정: Shift 키 크기/위치 변경 -->
             <button class="kbd-key" data-key="shift">Shift</button>
             <button class="kbd-key" data-key="ㅋ">ㅋ</button>
             <button class="kbd-key" data-key="ㅌ">ㅌ</button>
@@ -333,11 +319,9 @@
             <button class="kbd-key" data-key="ㅠ">ㅠ</button>
             <button class="kbd-key" data-key="ㅜ">ㅜ</button>
             <button class="kbd-key" data-key="ㅡ">ㅡ</button>
-            <!-- [!!!] 수정: '지우기' 버튼 위치 변경 -->
             <button class="kbd-key special" data-key="del">지우기</button>
         </div>
         <div class="kbd-row" id="kbd-row-4">
-            <!-- [!!!] 수정: '확인' 버튼만 남김 -->
             <button class="kbd-key special" data-key="enter">확인</button>
         </div>
     </div>
@@ -353,7 +337,6 @@
 
     <script>
         // --- 1. 데이터 ---
-        // [!!!] 수정: '국가' 퀴즈 데이터로 변경
         const questionBank = [
             { choseong: 'ㅎㄱ', answer: '한국', imageHint: '🇰🇷' },
             { choseong: 'ㅍㄹㅅ', answer: '프랑스', imageHint: '🇫🇷' },
@@ -510,9 +493,8 @@
             feedbackTimeoutEl.textContent = `시간 초과! 정답: ${correctAnswerWord}`;
             showInHintArea('timeout'); 
 
-            // [!!!] 수정: 다음 문제로 2초 후 이동
-            currentQuestionIndex++;
-            setTimeout(displayQuestion, 2000); 
+            // [!!!] 수정: 2초 후 다음 문제가 아닌, 게임을 처음부터 다시 시작 (startGame)
+            setTimeout(startGame, 2000); 
         }
 
         function checkAnswer() {
@@ -524,8 +506,6 @@
 
             if (!userInput) return; 
             
-            // [!!!] 수정: 'ㅇㅈ' 관련 중복 답안 처리 로직 제거 (국가 퀴즈에는 필요 없음)
-            // 정답과 정확히 일치하는지 확인
             if (userInput === correctAnswer) {
                 isAnswerCorrect = true;
             }
