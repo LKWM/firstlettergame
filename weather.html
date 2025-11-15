@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- [!!!] 수정: 제목 변경 -->
+    <title>날씨 초성 퀴즈</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+
+        /* --- 기본 스타일 --- */
+        * {
+            box-sizing: border-box; 
+        }
+        
+        html, body {
+            height: 100%; 
+            max-height: 100%; 
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f5f5f5; 
+            color: #333;
+            margin: 0;
+            overflow: hidden; 
+        }
+
+        body {
+            display: flex;
+            flex-direction: column; 
+            justify-content: center; 
+            padding: 5px 0;
+        }
+
+        /* --- 게임 컨테이너 --- */
+        #game-container {
+            background-color: #ffffff;
+            border-radius: 12px; 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); 
+            padding: 10px 15px; 
+            border: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 5px; 
+        }
+
+        /* --- 상태 표시줄 --- */
+        #status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem; 
+            font-weight: 700;
+            color: #555;
+            margin-bottom: 8px; 
+        }
+
+        /* --- 초성 --- */
+        #choseong-display {
+            font-size: 2.5rem; 
+            font-weight: 700;
+            color: #6a1b9a;
+            letter-spacing: 10px;
+            margin-bottom: 8px; 
+            padding: 10px 0; 
+            background-color: #f8f9fa;
+            border-radius: 8px; 
+            text-align: center;
+        }
+
+        /* --- 타이머 --- */
+        #timer-bar-container {
+            width: 100%;
+            height: 6px; 
+            background-color: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        #timer-bar {
+            width: 100%;
+            height: 100%;
+            background-color: #4caf50;
+            transition: width 1s linear;
+        }
+
+        /* --- 힌트 영역 --- */
+        #hint-area {
+            min-height: 80px; 
+            margin-top: 8px; 
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed #ddd;
+            border-radius: 8px; 
+            padding: 5px; 
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hint-box { font-size: 0.85rem; color: #555; } 
+        #image-hint { font-size: 2.5rem; } /* 이모지 기본 크기 */
+        #image-hint.hidden { display: none; }
+
+        /* 이미지 힌트 크기 조절 */
+        #image-hint img {
+            height: 4rem; 
+            max-width: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+
+        /* --- 피드백 메시지 --- */
+        .feedback {
+            font-size: 0.9rem; 
+            font-weight: 700;
+            padding: 5px; 
+            display: none; 
+            border-radius: 6px; 
+            text-align: center;
+            width: 100%;
+        }
+        .feedback.correct { color: #28a745; background-color: #e6f7ec; }
+        .feedback.wrong { color: #dc3545; background-color: #fdeeee; }
+        .feedback.info { color: #555; background-color: #f0f0f0; }
+        
+        /* --- 입력 영역 --- */
+        #input-area {
+            margin-top: 8px; 
+            display: flex;
+            gap: 5px; 
+        }
+
+        #answer-input {
+            flex-grow: 1;
+            min-width: 0;
+            padding: 10px; 
+            font-size: 1rem; 
+            border: 2px solid #ced4da;
+            border-radius: 6px; 
+            transition: border-color 0.3s;
+            text-align: center; 
+            font-weight: 700;
+            color: #333;
+            font-family: 'Noto Sans KR', sans-serif;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        #answer-input:focus { border-color: #6a1b9a; outline: none; }
+        #answer-input[readonly] { caret-color: transparent; }
+
+        #submit-btn {
+            flex-shrink: 0;
+            padding: 10px 15px; 
+            font-size: 1rem; 
+            font-weight: 700;
+            background-color: #6a1b9a;
+            color: white;
+            border: none;
+            border-radius: 6px; 
+            cursor: pointer;
+            transition: background-color 0.3s;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        #submit-btn:hover { background-color: #4a148c; }
+
+        /* --- 가상 키보드 --- */
+        #virtual-keyboard {
+            margin-top: 5px; 
+            padding: 5px; 
+            background-color: #e9ecef;
+            border-radius: 8px; 
+            flex-shrink: 0; 
+        }
+        
+        .kbd-row {
+            display: flex;
+            justify-content: center;
+            gap: 3px; 
+            margin-bottom: 3px; 
+        }
+        .kbd-row:last-child { margin-bottom: 0; }
+
+        .kbd-key {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.9rem; 
+            font-weight: 700;
+            background-color: #ffffff;
+            color: #333;
+            border: none;
+            border-radius: 5px; 
+            padding: 8px 0; 
+            flex-grow: 1; 
+            flex-basis: 0;
+            min-width: 26px; 
+            
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none; 
+            
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.1s, transform 0.1s;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        .kbd-key:active { background-color: #ddd; transform: translateY(1px); }
+        
+        .kbd-key.special {
+            flex-grow: 1.5;
+            background-color: #adb5bd;
+            color: white;
+            font-size: 0.7rem; 
+        }
+        .kbd-key.special:active { background-color: #868e96; }
+        .kbd-key.shift-active { background-color: #a5b4fc; color: #1e3a8a; }
+
+        /* --- 게임 종료 오버레이 --- */
+        #game-over-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        #game-over-box {
+            background-color: white;
+            padding: 30px 40px; 
+            border-radius: 15px; 
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: zoomIn 0.5s ease;
+            width: 90%;
+            max-width: 400px;
+        }
+        #game-over-box h2 { font-size: 2rem; color: #6a1b9a; margin-top: 0; } 
+        #game-over-box p { font-size: 1.2rem; margin-bottom: 25px; } 
+        #restart-btn {
+            padding: 12px 25px; 
+            font-size: 1.1rem; 
+            font-weight: 700;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        #restart-btn:hover { background-color: #218838; }
+        
+        @keyframes zoomIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 게임 컨텐츠 -->
+    <div id="game-container">
+        <div id="status-bar">
+            <span id="question-counter">문제 1 / 10</span>
+            <span id="total-score">총 점수: 0 점</span>
+        </div>
+        <div id="question-area">
+            <div id="choseong-display">ㅎ</div>
+            <div id="timer-bar-container">
+                <div id="timer-bar"></div>
+            </div>
+        </div>
+
+        <div id="hint-area">
+            <div id="image-hint" class="hint-box hidden"></div>
+            <div id="initial-hint-text" class="hint-box">10초 후에 힌트가 나옵니다. (총 20초)</div>
+            
+            <div id="feedback-correct" class="feedback correct">정답입니다! (+0점)</div>
+            <div id="feedback-wrong" class="feedback wrong">틀렸습니다. 다시 시도하세요.</div>
+            <div id="feedback-timeout" class="feedback info">시간 초과! 정답: </div>
+        </div>
+
+        <div id="input-area">
+            <input type="text" id="answer-input" placeholder="정답을 입력하세요...">
+            <button id="submit-btn">확인</button>
+        </div>
+    </div>
+    
+    <!-- 가상 키보드 HTML (이전과 동일) -->
+    <div id="virtual-keyboard">
+        <div class="kbd-row" id="kbd-row-1">
+            <button class="kbd-key" data-key="ㅂ" data-shift="ㅃ">ㅂ</button>
+            <button class="kbd-key" data-key="ㅈ" data-shift="ㅉ">ㅈ</button>
+            <button class="kbd-key" data-key="ㄷ" data-shift="ㄸ">ㄷ</button>
+            <button class="kbd-key" data-key="ㄱ" data-shift="ㄲ">ㄱ</button>
+            <button class="kbd-key" data-key="ㅅ" data-shift="ㅆ">ㅅ</button>
+            <button class="kbd-key" data-key="ㅛ">ㅛ</button>
+            <button class="kbd-key" data-key="ㅕ">ㅕ</button>
+            <button class="kbd-key" data-key="ㅑ">ㅑ</button>
+            <button class="kbd-key" data-key="ㅐ" data-shift="ㅒ">ㅐ</button>
+            <button class="kbd-key" data-key="ㅔ" data-shift="ㅖ">ㅔ</button>
+        </div>
+        <div class="kbd-row" id="kbd-row-2">
+            <button class="kbd-key" data-key="ㅁ">ㅁ</button>
+            <button class="kbd-key" data-key="ㄴ">ㄴ</button>
+            <button class="kbd-key" data-key="ㅇ">ㅇ</button>
+            <button class="kbd-key" data-key="ㄹ">ㄹ</button>
+            <button class="kbd-key" data-key="ㅎ">ㅎ</button>
+            <button class="kbd-key" data-key="ㅗ">ㅗ</button>
+            <button class="kbd-key" data-key="ㅓ">ㅓ</button>
+            <button class="kbd-key" data-key="ㅏ">ㅏ</button>
+            <button class="kbd-key" data-key="ㅣ">ㅣ</button>
+        </div>
+        <div class="kbd-row" id="kbd-row-3">
+            <button class="kbd-key" data-key="shift">Shift</button>
+            <button class="kbd-key" data-key="ㅋ">ㅋ</button>
+            <button class="kbd-key" data-key="ㅌ">ㅌ</button>
+            <button class="kbd-key" data-key="ㅊ">ㅊ</button>
+            <button class="kbd-key" data-key="ㅍ">ㅍ</button>
+            <button class="kbd-key" data-key="ㅠ">ㅠ</button>
+            <button class="kbd-key" data-key="ㅜ">ㅜ</button>
+            <button class="kbd-key" data-key="ㅡ">ㅡ</button>
+            <button class="kbd-key special" data-key="del">지우기</button>
+        </div>
+        <div class="kbd-row" id="kbd-row-4">
+            <button class="kbd-key special" data-key="enter">확인</button>
+        </div>
+    </div>
+    
+    <!-- 게임 종료 화면 -->
+    <div id="game-over-overlay">
+        <div id="game-over-box">
+            <h2>게임 종료!</h2>
+            <p id="final-score">최종 점수: 0 점</p>
+            <button id="restart-btn">다시 시작하기</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 데이터 ---
+        // [!!!] 수정: '날씨' 퀴즈 데이터로 변경
+        const questionBank = [
+            { choseong: 'ㅎ', answer: '해', imageHint: '☀️' },
+            { choseong: 'ㅂ', answer: '비', imageHint: '🌧️' },
+            { choseong: 'ㄴ', answer: '눈', imageHint: '🌨️' },
+            { choseong: 'ㄱㄹ', answer: '구름', imageHint: '☁️' },
+            { choseong: 'ㅂㄹ', answer: '바람', imageHint: '💨' },
+            { choseong: 'ㅂㄱ', answer: '번개', imageHint: '⚡️' },
+            { choseong: 'ㅁㅈㄱ', answer: '무지개', imageHint: '🌈' },
+            { choseong: 'ㅇㄱ', answer: '안개', imageHint: '🌫️' },
+            { choseong: 'ㅌㅍ', answer: '태풍', imageHint: '🌀' },
+            { choseong: 'ㅇㅂ', answer: '우박', imageHint: '🧊' } // 우박에 대한 이모지가 명확하지 않아 얼음으로 대체
+        ];
+
+
+        let shuffledQuestions = [];
+        let currentQuestionIndex = 0;
+        let totalScore = 0;
+        let currentPoints = 2;
+        let questionTimer;
+        let secondsElapsed;
+
+        // --- 2. HTML 요소 가져오기 ---
+        const questionCounterEl = document.getElementById('question-counter');
+        const totalScoreEl = document.getElementById('total-score');
+        const choseongDisplayEl = document.getElementById('choseong-display');
+        const timerBarEl = document.getElementById('timer-bar');
+        const initialHintTextEl = document.getElementById('initial-hint-text');
+        const imageHintEl = document.getElementById('image-hint');
+        const answerInputEl = document.getElementById('answer-input');
+        const submitBtnEl = document.getElementById('submit-btn');
+        
+        const feedbackCorrectEl = document.getElementById('feedback-correct');
+        const feedbackWrongEl = document.getElementById('feedback-wrong');
+        const feedbackTimeoutEl = document.getElementById('feedback-timeout');
+        
+        const gameOverOverlayEl = document.getElementById('game-over-overlay');
+        const finalScoreEl = document.getElementById('final-score');
+        const restartBtnEl = document.getElementById('restart-btn');
+        
+        const virtualKeyboardEl = document.getElementById('virtual-keyboard');
+
+        // --- 3. 핵심 기능 함수 ---
+
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startGame() {
+            totalScore = 0;
+            currentQuestionIndex = 0;
+            shuffledQuestions = shuffleArray([...questionBank]); 
+            totalScoreEl.textContent = `총 점수: 0 점`;
+            gameOverOverlayEl.style.display = 'none';
+            displayQuestion();
+        }
+
+        function showInHintArea(elementToShow) {
+            initialHintTextEl.style.display = 'none';
+            imageHintEl.classList.add('hidden');
+            feedbackCorrectEl.style.display = 'none';
+            feedbackWrongEl.style.display = 'none';
+            feedbackTimeoutEl.style.display = 'none';
+
+            if (elementToShow === 'initial') {
+                initialHintTextEl.style.display = 'block';
+            } else if (elementToShow === 'image') {
+                imageHintEl.classList.remove('hidden');
+            } else if (elementToShow === 'correct') {
+                feedbackCorrectEl.style.display = 'block';
+            } else if (elementToShow === 'wrong') {
+                feedbackWrongEl.style.display = 'block';
+            } else if (elementToShow === 'timeout') {
+                feedbackTimeoutEl.style.display = 'block';
+            }
+        }
+        
+        function resetHints() {
+            showInHintArea('initial');
+            imageHintEl.innerHTML = ''; 
+            imageHintEl.textContent = '';
+        }
+
+        function displayQuestion() {
+            resetHints(); 
+
+            answerInputEl.value = '';
+            answerInputEl.disabled = false;
+            submitBtnEl.disabled = false;
+            
+            if (isTouchDevice) {
+                answerInputEl.readOnly = true;
+                answerInputEl.style.caretColor = 'transparent';
+            } else {
+                answerInputEl.readOnly = false;
+                answerInputEl.style.caretColor = 'auto';
+                answerInputEl.focus();
+            }
+
+            if (currentQuestionIndex >= 10) {
+                showGameResult();
+                return;
+            }
+
+            currentPoints = 2;
+            secondsElapsed = 0;
+            timerBarEl.style.transition = 'none'; 
+            timerBarEl.style.width = '100%';
+            timerBarEl.style.backgroundColor = '#4caf50'; 
+            
+            const question = shuffledQuestions[currentQuestionIndex];
+            choseongDisplayEl.textContent = question.choseong;
+            questionCounterEl.textContent = `문제 ${currentQuestionIndex + 1} / 10`;
+
+            clearInterval(questionTimer); 
+            questionTimer = setInterval(updateTimer, 1000);
+            
+            setTimeout(() => {
+                timerBarEl.style.transition = 'width 1s linear';
+            }, 100);
+        }
+
+        function updateTimer() {
+            secondsElapsed++;
+            const totalTime = 20;
+            let timeRemainingPercent = 100 - (secondsElapsed / totalTime) * 100;
+            timerBarEl.style.width = `${timeRemainingPercent}%`;
+
+            if (secondsElapsed === 10) {
+                currentPoints = 1;
+                showImageHint();
+                timerBarEl.style.backgroundColor = '#ffc107';
+            }
+            else if (secondsElapsed === 20) {
+                currentPoints = 0;
+                clearInterval(questionTimer);
+                handleTimeout();
+            }
+        }
+
+        function showImageHint() {
+            const question = shuffledQuestions[currentQuestionIndex];
+            const hint = question.imageHint;
+            
+            if (hint.startsWith('<img')) {
+                imageHintEl.innerHTML = hint;
+            } else {
+                imageHintEl.textContent = hint;
+            }
+            showInHintArea('image'); 
+        }
+
+
+        function handleTimeout() {
+            answerInputEl.disabled = true;
+            submitBtnEl.disabled = true;
+            
+            const correctAnswerWord = shuffledQuestions[currentQuestionIndex].answer;
+            feedbackTimeoutEl.textContent = `시간 초과! 정답: ${correctAnswerWord}`;
+            showInHintArea('timeout'); 
+
+            setTimeout(startGame, 2000); 
+        }
+
+        function checkAnswer() {
+            const userInput = answerInputEl.value.trim();
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            const correctAnswer = currentQuestion.answer;
+            
+            let isAnswerCorrect = false;
+
+            if (!userInput) return; 
+            
+            if (userInput === correctAnswer) {
+                isAnswerCorrect = true;
+            }
+
+
+            if (isAnswerCorrect) {
+                clearInterval(questionTimer);
+                answerInputEl.disabled = true;
+                submitBtnEl.disabled = true;
+
+                totalScore += currentPoints;
+                totalScoreEl.textContent = `총 점수: ${totalScore} 점`;
+                
+                feedbackCorrectEl.textContent = `정답! +${currentPoints}점`;
+                showInHintArea('correct'); 
+
+                currentQuestionIndex++;
+                
+                setTimeout(displayQuestion, 1500); 
+            }
+            else {
+                feedbackWrongEl.textContent = '틀렸습니다. 다시 시도하세요.';
+                showInHintArea('wrong'); 
+                
+                answerInputEl.value = ''; 
+                
+                if (!isTouchDevice) {
+                    answerInputEl.focus();
+                }
+
+                setTimeout(() => {
+                    if (secondsElapsed >= 10) {
+                        showImageHint(); 
+                    } else {
+                        showInHintArea('initial');
+                    }
+                }, 1000);
+            }
+        }
+
+        function showGameResult() {
+            finalScoreEl.textContent = `최종 점수: ${totalScore} 점`;
+            gameOverOverlayEl.style.display = 'flex';
+
+            const scoreMessage = {
+                type: 'game_score',
+                score: totalScore 
+            };
+            if (window.parent) {
+                window.parent.postMessage(scoreMessage, '*');
+            }
+        }
+
+        // --- 4. 이벤트 리스너 ---
+        
+        submitBtnEl.addEventListener('click', checkAnswer);
+        answerInputEl.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        restartBtnEl.addEventListener('click', startGame);
+        
+        virtualKeyboardEl.addEventListener('click', function(e) {
+            const key = e.target.closest('.kbd-key');
+            if (!key) return; 
+            if (answerInputEl.disabled) return;
+
+            let keyVal;
+            const keyData = key.dataset.key; 
+            
+            if (keyData === 'shift') {
+                toggleShift(); 
+                return; 
+            } 
+            if (keyData === 'del') {
+                handleBackspace();
+            } else if (keyData === 'enter') {
+                checkAnswer();
+            } else {
+                if (isShifted) {
+                    keyVal = key.dataset.shift || key.dataset.key; 
+                } else {
+                    keyVal = key.dataset.key; 
+                }
+                typeHangul(keyVal); 
+            }
+            
+            if (!isTouchDevice) {
+                answerInputEl.focus();
+            }
+        });
+        
+        // --- 5. 한글 IME (조합/분해) 로직 ---
+
+        const CHOSEONG = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+        const JUNGSEONG = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
+        const JONGSEONG = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+        
+        const COMPLEX_JAMO_KEY = {
+            'ㄱㅅ': 'ㄳ', 'ㄴㅈ': 'ㄵ', 'ㄴㅎ': 'ㄶ', 'ㄹㄱ': 'ㄺ', 'ㄹㅁ': 'ㄻ', 'ㄹㅂ': 'ㄼ', 'ㄹㅅ': 'ㄽ', 'ㄹㅌ': 'ㄾ', 'ㄹㅍ': 'ㄿ', 'ㄹㅎ': 'ㅀ', 'ㅂㅅ': 'ㅄ',
+            'ㅗㅏ': 'ㅘ', 'ㅗㅐ': 'ㅙ', 'ㅗㅣ': 'ㅚ', 'ㅜㅓ': 'ㅝ', 'ㅜㅔ': 'ㅞ', 'ㅜㅣ': 'ㅟ', 'ㅡㅣ': 'ㅢ'
+        };
+        
+        const DECOMPOSE_COMPLEX_JAMO = {
+            'ㄳ': ['ㄱ', 'ㅅ'], 'ㄵ': ['ㄴ', 'ㅈ'], 'ㄶ': ['ㄴ', 'ㅎ'], 'ㄺ': ['ㄹ', 'ㄱ'], 'ㄻ': ['ㄹ', 'ㅁ'], 'ㄼ': ['ㄹ', 'ㅂ'], 'ㄽ': ['ㄹ', 'ㅅ'], 'ㄾ': ['ㄹ', 'ㅌ'], 'ㄿ': ['ㄹ', 'ㅍ'], 'ㅀ': ['ㄹ', 'ㅎ'], 'ㅄ': ['ㅂ', 'ㅅ'],
+            'ㅘ': ['ㅗ', 'ㅏ'], 'ㅙ': ['ㅗ', 'ㅐ'], 'ㅚ': ['ㅗ', 'ㅣ'], 'ㅝ': ['ㅜ', 'ㅓ'], 'ㅞ': ['ㅜ', 'ㅔ'], 'ㅟ': ['ㅜ', 'ㅣ'], 'ㅢ': ['ㅡ', 'ㅣ']
+        };
+
+        const HANGUL_START = 0xAC00;
+        const HANGUL_END = 0xD7A3;
+        
+        function compose(choIdx, jungIdx, jongIdx) {
+            return String.fromCharCode(HANGUL_START + (choIdx * 21 * 28) + (jungIdx * 28) + jongIdx);
+        }
+
+        function decompose(char) {
+            const code = char.charCodeAt(0);
+            if (code < HANGUL_START || code > HANGUL_END) {
+                return null;
+            }
+            const unicode = code - HANGUL_START;
+            const jongIdx = unicode % 28;
+            const jungIdx = ((unicode - jongIdx) / 28) % 21;
+            const choIdx = Math.floor(((unicode - jongIdx) / 28) / 21);
+            return [choIdx, jungIdx, jongIdx];
+        }
+        
+        function typeHangul(key) {
+            const val = answerInputEl.value;
+            const lastChar = val.slice(-1);
+            
+            const isJung = JUNGSEONG.includes(key); 
+            const isJong = JONGSEONG.includes(key); 
+
+            if (isShifted) {
+                toggleShift();
+            }
+
+            if (!lastChar || !decompose(lastChar)) {
+                if (CHOSEONG.includes(lastChar) && isJung) {
+                    const choIdx = CHOSEONG.indexOf(lastChar);
+                    const jungIdx = JUNGSEONG.indexOf(key);
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, jungIdx, 0); 
+                }
+                else {
+                    answerInputEl.value += key;
+                }
+                return;
+            }
+
+            const [choIdx, jungIdx, jongIdx] = decompose(lastChar);
+
+            if (jongIdx === 0) {
+                const jung = JUNGSEONG[jungIdx];
+                const combinedJung = COMPLEX_JAMO_KEY[jung + key]; 
+                
+                if (isJung && combinedJung) {
+                    const newJungIdx = JUNGSEONG.indexOf(combinedJung);
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, newJungIdx, 0);
+                }
+                else if (isJong) {
+                    const newJongIdx = JONGSEONG.indexOf(key);
+                    if (newJongIdx > 0) { 
+                         answerInputEl.value = val.slice(0, -1) + compose(choIdx, jungIdx, newJongIdx);
+                    } else {
+                         answerInputEl.value += key;
+                    }
+                }
+                else {
+                    answerInputEl.value += key;
+                }
+            }
+            else {
+                const jong = JONGSEONG[jongIdx];
+                const combinedJong = COMPLEX_JAMO_KEY[jong + key]; 
+
+                if (isJung) {
+                    let lastCharJong, newCharCho; 
+                    const decomposedJong = DECOMPOSE_COMPLEX_JAMO[jong];
+                    
+                    if (decomposedJong) { 
+                        lastCharJong = decomposedJong[0];
+                        newCharCho = decomposedJong[1];
+                    } else { 
+                        lastCharJong = '';
+                        newCharCho = jong;
+                    }
+
+                    const newLastJongIdx = JONGSEONG.indexOf(lastCharJong);
+                    const newCharChoIdx = CHOSEONG.indexOf(newCharCho);
+                    const newCharJungIdx = JUNGSEONG.indexOf(key);
+
+                    answerInputEl.value = val.slice(0, -1) + 
+                                          compose(choIdx, jungIdx, newLastJongIdx) + 
+                                          compose(newCharChoIdx, newCharJungIdx, 0);
+                }
+                else if (isJong && combinedJong && JONGSEONG.includes(combinedJong)) {
+                    const newJongIdx = JONGSEONG.indexOf(combinedJong);
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, jungIdx, newJongIdx);
+                }
+                else {
+                    answerInputEl.value += key;
+                }
+            }
+        }
+        
+        function handleBackspace() {
+            const val = answerInputEl.value;
+            if (val.length === 0) return;
+
+            const lastChar = val.slice(-1);
+            const decomposed = decompose(lastChar);
+            
+            if (!decomposed) {
+                answerInputEl.value = val.slice(0, -1);
+                return;
+            }
+
+            const [choIdx, jungIdx, jongIdx] = decomposed;
+            
+            if (jongIdx > 0) {
+                const jong = JONGSEONG[jongIdx];
+                const decomposedJong = DECOMPOSE_COMPLEX_JAMO[jong]; 
+
+                if (decomposedJong) {
+                    const newJongIdx = JONGSEONG.indexOf(decomposedJong[0]);
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, jungIdx, newJongIdx);
+                } 
+                else {
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, jungIdx, 0);
+                }
+            }
+            else {
+                const jung = JUNGSEONG[jungIdx];
+                const decomposedJung = DECOMPOSE_COMPLEX_JAMO[jung]; 
+
+                if (decomposedJung) {
+                    const newJungIdx = JUNGSEONG.indexOf(decomposedJung[0]);
+                    answerInputEl.value = val.slice(0, -1) + compose(choIdx, newJungIdx, 0);
+                }
+                else {
+                    answerInputEl.value = val.slice(0, -1) + CHOSEONG[choIdx];
+                }
+            }
+        }
+        
+        let isShifted = false;
+        const shiftKeyEl = document.querySelector('.kbd-key[data-key="shift"]');
+        const shiftableKeyEls = document.querySelectorAll('.kbd-key[data-shift]');
+        
+        function toggleShift() {
+            isShifted = !isShifted;
+            shiftKeyEl.classList.toggle('shift-active', isShifted);
+            
+            shiftableKeyEls.forEach(keyEl => {
+                 const originalKey = keyEl.dataset.key; 
+                 const shiftKey = keyEl.dataset.shift; 
+                 
+                 if (isShifted) {
+                      keyEl.textContent = shiftKey; 
+                 } else {
+                      keyEl.textContent = originalKey; 
+                 }
+            });
+        }
+
+        // --- 6. 게임 시작 ---
+        startGame();
+
+    </script>
+</body>
+</html>
